@@ -99,7 +99,7 @@ Screen Mode Characteristics:
 - Always reflects live data
 - Ideal for quick, ad-hoc displays
 
-Examples:
+Screen Mode Examples:
 - Showing the current room schedule outside a session room
 - Displaying a presenter info slide during their introduction
 - Looping sponsor logos between sessions
@@ -126,7 +126,7 @@ Display Board Characteristics:
 - Has saved defaults
 - Supports URL overrides for one-off situations
 
-Examples:
+Display Board Examples:
 - A welcome screen in the lobby
 - A rotating sponsor carousel
 - A full schedule overview
@@ -135,27 +135,28 @@ Examples:
 
 ## Screen Casting
 
-The easiest way to present *ConBoard* info screens on a TV or projector is directly from a laptop or desktop computer over an HDMI cable. Alternatively, there are inexpensive wireless video transmitters that connect to your HDMI port and treat it as a standard monitor. It is recommended to use "Extend" mode and treat that screen as a second monitor rather than "Mirror" mode. Then simply navigate to the desired URL and enter the browser's fullscreen mode. The number of screens you can stream to depends on your computer hardware and how many video outputs are available.
+The easiest way to present *ConBoard* info screens on a TV or projector is connecting directly from a laptop or desktop computer over an HDMI cable. Because *ConBoard* is fully web-based, any device with a web browser should work. Alternatively, there are inexpensive wireless video transmitters that plug in to your HDMI port and are seen as standard monitor. It is recommended to use "Extend" mode and treat that screen as a second monitor rather than "Mirror" mode. Then simply navigate to the desired URL and enter the browser's fullscreen mode. The number of screens you can stream to depends on your computer hardware and how many video outputs are available. If you want the same content going to multiple screens, you can use a simple HDMI splitter/duplicator.
 
+#### Wireless HDMI Adapters:
 - $15 [onn Full HD Streaming Device](https://www.walmart.com/ip/Google-TV-Full-HD-Streaming-Device-NEW-2023/2262757145)
--	$20	[Roku Streaming Stick HD](https://www.amazon.com/dp/B0DXXYS4BJ/)
-- $30	[Roku Streaming Stick Plus](https://www.amazon.com/dp/B0DXY833HV/)
-- $30	[EZCast PRO Dongle Wireless HD](https://www.amazon.com/dp/B01N551MI6/)
--	$35	[Wireless HDMI Transmitter and Receiver](https://www.amazon.com/dp/B0FR4K4VQJ/)
-- $35	[WEKEFON Wireless HDMI Transmitter and Receiver](https://www.amazon.com/dp/B0FR4G43YR/)
+- $20 [Roku Streaming Stick HD](https://www.amazon.com/dp/B0DXXYS4BJ/)
+- $30 [Roku Streaming Stick Plus](https://www.amazon.com/dp/B0DXY833HV/)
+- $30 [EZCast PRO Dongle Wireless HD](https://www.amazon.com/dp/B01N551MI6/)
+- $35 [Wireless HDMI Transmitter and Receiver](https://www.amazon.com/dp/B0FR4K4VQJ/)
+- $35 [WEKEFON Wireless HDMI Transmitter and Receiver](https://www.amazon.com/dp/B0FR4G43YR/)
 - $35 [Wireless HDMI Display Adapter](https://www.walmart.com/ip/Wireless-HDMI-Transmitter-Receiver-2-in-1-Plug-Play-Transmitter-4K-Decode-1080P-Output-Video-Streaming-Laptop-PC-Tablet-Smartphone-TV-Monitor-Project/17345620407)
 - $35 [TiVo Stream 4K](https://www.amazon.com/dp/B089655HQV/)
-- $42	[EZCast2 4K Wireless Display Receiver](https://www.amazon.com/dp/B07YKGGTJL/)
+- $42 [EZCast2 4K Wireless Display Receiver](https://www.amazon.com/dp/B07YKGGTJL/)
 - $42 [MT-VIKI 4K Wireless HDMI Display Dongle](https://www.amazon.com/dp/B0DY7RDMVY/)
 - $50 [Amazon Fire TV Stick 4K Plus](https://www.amazon.com/dp/B0F7Z4QZTT/)
 - $70 [XIAOMI TV Stick 4K Streaming Device](https://www.amazon.com/dp/B0FFN6NRTZ)
 
-#### Cast Wirelessly from Google Chrome
-1. Open Chrome: Launch the browser on your computer. 
-1. Open the Menu: Click the three vertical dots (More) in the top-right corner. 
-1. Select Cast: Go to Save and share > Cast.... 
-1. Choose Source: Click the "Sources" dropdown to select if you want to cast a specific Tab, your entire Screen, or a File. 
-1. Select Device: Pick your Chromecast or smart TV from the list of available devices. 
+#### HDMI Splitters:
+- $10 [1 in 2 Out HDMI Splitter Cable Adapter](https://www.amazon.com/dp/B07K2NZX8L/)
+- $13 [1 in 4 Out HDMI Duplicator](https://www.amazon.com/dp/B0DCJ5PR11/)
+- $17 [1 in 4 Out Powered HDMI Video Splitter](https://www.amazon.com/dp/B076JDXPRG/)
+- $18 [1 in 4 Out HDMI Splitter Distributor Box](https://www.amazon.com/gp/aw/d/B081GL1CMV/)
+- $32 [1 in 8 Out Powered HDMI Splitter](https://www.amazon.com/dp/B07T558FPG)
 
 Some venues may have a central routing hub to send video signals to various screens. Others may need a device to be directly attached at the back of the TV. In cases where it is not practical to have a laptop connected to each screen, a dedicated playback device may be more reasonable. You can also use the web browser feature in any existing digital signage playback units you may have. For example:
 
@@ -166,7 +167,14 @@ Some venues may have a central routing hub to send video signals to various scre
 - [Screencloud](https://screencloud.com/pixi)
 - A Raspberry Pi is a good option as well!
 
-Many smart TVs allow streaming content to them wirelessly as a built in-feature. Check the specific TV mmodel to see if it supports [Apple AirPlay](https://en.wikipedia.org/wiki/AirPlay), [GoogleCast]([https://support.google.com/googlecast/answer/6102923?hl=en](https://en.wikipedia.org/wiki/Google_Cast)) or [Miracast](https://en.wikipedia.org/wiki/Miracast). Otherwise, a small [Roku](https://www.roku.com/products/players/roku-streaming-stick?srsltid=AfmBOoonLperAl9Lj9et-0qPcX6ye9-ARTsAAYnkvd6EozEjd1QTnwU8), [Chromecast](https://en.wikipedia.org/wiki/Chromecast), or [Fire TV Stick](https://www.amazon.com/firetv/streaming-media-players) can be a possible option as hardware receivers to connect to the screen's HDMI port. They do not have to be the latest model, and can be found inexpensively on Amazon and eBay. Second hand works perfectly fine. You could even use an old Xbox or PlayStation.
+Many smart TVs allow streaming content to them over wi-fi as a built in-feature. Check the specific TV mmodel to see if it supports [Apple AirPlay](https://en.wikipedia.org/wiki/AirPlay), [GoogleCast]([https://support.google.com/googlecast/answer/6102923?hl=en](https://en.wikipedia.org/wiki/Google_Cast)) or [Miracast](https://en.wikipedia.org/wiki/Miracast). Otherwise, a small [Roku](https://www.roku.com/products/players/roku-streaming-stick?srsltid=AfmBOoonLperAl9Lj9et-0qPcX6ye9-ARTsAAYnkvd6EozEjd1QTnwU8), [Chromecast](https://en.wikipedia.org/wiki/Chromecast), or [Fire TV Stick](https://www.amazon.com/firetv/streaming-media-players) can be a possible option as hardware receivers to connect to the screen's HDMI port. They do not have to be the latest model, and can be found inexpensively on Amazon and eBay. Second-hand works perfectly fine. 
+
+#### Cast Wirelessly from Google Chrome
+1. Open Chrome: Launch the browser on your computer. 
+1. Open the Menu: Click the three vertical dots (More) in the top-right corner. 
+1. Select Cast: Go to Save and share > Cast.... 
+1. Choose Source: Click the "Sources" dropdown to select if you want to cast a specific Tab, your entire Screen, or a File. 
+1. Select Device: Pick your Chromecast or smart TV from the list of available devices. 
 
 Some TVs have a built-in web browser, but this is much less common and unlikely to find at an event venue.
 
@@ -178,7 +186,6 @@ Please note that for any of these wireless options, your computer and the receiv
 
 ## Media Export
 
-If screen casting a live webpage is not an option for your situation, ConBoard still has available options for you. Most smart TVs will have a USB port that can display pictures and videos from a storage device and play them like a slideshow. The utility menu in the corner of every display screen has a download option. This will save the sceen as a 1920x1080 JPG image that can be copied to a flash drive. If your Display Board has animated content or is cycling through a content loop, each "slide" will be saved as separate image, numbered in sequence. Built-in video export is not yet available for moving content, but can be captured manually through screen recording if desired. You can also batch-export multiple Display Boards and Screen Mode pages from the Admin console.
+If screen casting a live webpage is not an option for your situation, *ConBoard* still has available options for you. Most smart TVs will have a USB port that can display pictures and videos from a storage device and play them like a slideshow. The utility menu in the corner of every display screen has a download option. This will save the sceen as a 1920x1080 JPG image that can be copied to a flash drive. If your Display Board has animated content or is cycling through a content loop, each "slide" will be saved as separate image, numbered in sequence. Built-in video export is not yet available for moving content, but can be captured manually through screen recording if desired. You can also batch-export multiple Display Boards and Screen Mode pages from the Admin console.
 
-The caveat with the export method is that your content will be static. The info displays cannot be updated live if there are updates made to the online schedule, the clock option will not be included, and live announcements will not be present. Any changes will require you to manually update the files on your flash drive.
-
+The caveat with the export method is that your content will be static. The info displays cannot be updated live if there are updates made to the online schedule, the clock option will not be included, and live announcements will not be present. Any changes will require you to re-export and manually update the files on your flash drive.
