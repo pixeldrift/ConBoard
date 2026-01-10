@@ -1,0 +1,188 @@
+/* assets/style.css */
+
+/* ADMIN Styles */
+
+.wrap {
+    margin: 20px 60px 20px 60px;
+
+}
+
+h1 {
+    font-size: 40px;
+    font-weight: bold;
+    margin: 0;
+}
+h2 {
+    font-size: 20px;
+    margin: 0 0 30px 0;
+}
+
+#adminmenu .wp-submenu .wp-menu-separator {
+    margin: 6px 0;
+}
+
+.conboard-dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.conboard-card {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 12px;
+    padding: 12px;
+    box-sizing: border-box;
+    text-decoration: none;
+    color: inherit;
+    transition: box-shadow 0.2s ease, transform 0.1s ease;
+}
+
+.conboard-card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%; /* ensure card-body fills card */
+}
+
+.conboard-card:hover {
+    border: 2px solid #2271b1;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    transform: translate(-1px, -1px);
+    margin-bottom: -2px;
+    margin-right: -2px;
+}
+
+.conboard-card:focus-visible {
+    outline: 2px solid #2271b1;
+    outline-offset: 2px;
+}
+
+.conboard-card-icon {
+    display: block;
+    font-family: dashicons;
+    font-size: 50px;
+    color: #2271b1;
+    margin-top: 20px;
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.conboard-card h3 {
+    margin: 0 0 6px;
+    font-size: 20px;
+    text-align: center;
+}
+
+.conboard-card-desc {
+    font-size: 13px;
+    color: #555;
+    line-height: 1.4;
+}
+
+.conboard-card-count {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    background: #2271b1;
+    color: #fff;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.conboard-card-add {
+    bottom: 10px;
+    right: 12px;
+    align-self: flex-end; /* float right */
+    font-size: 12px;
+    padding: 4px 8px;
+    background: #f6f7f7;
+    border-radius: 6px;
+    text-decoration: none;
+    color: #2271b1;
+    border: 1px solid #ccd0d4;
+}
+
+.conboard-card-add:hover {
+    background: #fff;
+}
+
+
+/* Display Screen Styles */
+
+.display-tv .screen-root {
+    width: 100vw;
+    height: 100vh;
+}
+
+.orientation-portrait.rotation-90 .screen-root {
+    transform: rotate(90deg);
+    transform-origin: center;
+    width: 100vh;
+    height: 100vw;
+}
+
+/* 
+Map preview on Locations admin edit pages
+*/
+.conboard-map-layout {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    margin-top: 10px;
+}
+
+.conboard-map-preview {
+    flex: 0 0 360px;
+}
+
+.conboard-map-preview img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #ccc;
+    background: #fff;
+}
+
+.conboard-map-layers {
+    flex: 1;
+    max-height: 420px;
+    overflow-y: auto;
+    padding: 6px 4px;
+    border-left: 1px solid #ddd;
+}
+
+.conboard-map-layers label {
+    display: block;
+    margin-bottom: 6px;
+}
+
+/* 
+Admin Settings page
+*/
+
+.conboard-level-row[data-editing="false"] .level-edit {
+  display: none;
+}
+
+.conboard-level-row[data-editing="true"] .level-display {
+  display: none;
+}
+
+.conboard-level-row {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.conboard-level-row .actions {
+  margin-top: 6px;
+}
+

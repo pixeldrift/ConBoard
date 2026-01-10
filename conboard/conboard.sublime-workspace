@@ -1,0 +1,303 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"files",
+				"buttonSelectFiles"
+			],
+			[
+				"comp",
+				"compModeGroup"
+			],
+			[
+				"--sys",
+				"--systemLightGray"
+			],
+			[
+				"--",
+				"--systemGray"
+			],
+			[
+				"dark",
+				"darkBlue"
+			],
+			[
+				"--dar",
+				"--darkPink"
+			],
+			[
+				"bird",
+				"bird-list-placeholder"
+			],
+			[
+				"--system",
+				"--systemNavy"
+			],
+			[
+				"margin",
+				"margin-bottom"
+			],
+			[
+				"backg",
+				"background-color"
+			],
+			[
+				"ba",
+				"background-color"
+			],
+			[
+				"font",
+				"font-family"
+			],
+			[
+				"text",
+				"text-align\tproperty"
+			],
+			[
+				"all",
+				"allLists"
+			],
+			[
+				"bord",
+				"border-radius\tproperty"
+			],
+			[
+				"bg",
+				"background-color\tproperty"
+			],
+			[
+				"name",
+				"name"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"console":
+	{
+		"height": 0.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/Users/macadmin/Desktop/Clients/NaNoCon/conboard"
+	],
+	"file_history":
+	[
+		"/Users/macadmin/Desktop/Clients/NaNoCon/ConBoard/includes/qr-code.php",
+		"/Users/macadmin/Desktop/Clients/NaNoCon/ConBoard/includes/defaults.php",
+		"/Users/macadmin/Desktop/Clients/NaNoCon/ConBoard/includes/activation.php",
+		"/Users/macadmin/Desktop/Clients/NaNoCon/ConBoard/includes/helpers.php",
+		"/Users/macadmin/Desktop/Clients/NaNoCon/ConBoard/includes/display/display-params.php",
+		"/Users/macadmin/Desktop/Clients/NaNoCon/ConBoard/includes/admin/room-metaboxes.php",
+		"/Users/macadmin/Desktop/Clients/NaNoCon/ConBoard/includes/admin/display-board-actions.php",
+		"/Users/macadmin/Desktop/Clients/NaNoCon/ConBoard/includes/display/display-bootstrap.php",
+		"/Users/macadmin/Desktop/Clients/NaNoCon/ConBoard/includes/display/display-routing.php",
+		"/Users/macadmin/Desktop/Clients/NaNoCon/ConBoard/includes/display/display-qr-code.php",
+		"/Users/macadmin/Desktop/Clients/NaNoCon/ConBoard/conboard.php",
+		"/Users/macadmin/Desktop/Clients/NaNoCon/ConBoard/includes/display/display-hooks.php",
+		"/Users/macadmin/Desktop/Clients/NaNoCon/ConBoard/includes/display/display-context.php",
+		"/Users/macadmin/Desktop/Clients/NaNoCon/ConBoard/includes/fields.php",
+		"/Users/macadmin/Desktop/Clients/NaNoCon/ConBoard/includes/shortcodes.php",
+		"/Users/macadmin/Desktop/Clients/NaNoCon/ConBoard/includes/taxonomies.php",
+		"/Users/macadmin/Desktop/Clients/NaNoCon/ConBoard/includes/post-types/cpt-room.php",
+		"/Users/macadmin/Desktop/Clients/NaNoCon/ConBoard/includes/post-types/cpt-announcement.php",
+		"/Users/macadmin/Desktop/Clients/NaNoCon/ConBoard/includes/helpers-time.php",
+		"/Users/macadmin/Desktop/Clients/NaNoCon/ConBoard/includes/display/bootstrap.php",
+		"/Users/macadmin/Desktop/Clients/NaNoCon/ConBoard/includes/display/display-routing",
+		"/Users/macadmin/Desktop/Clients/NaNoCon/ConBoard/includes/post-types/cpt-sponsor.php",
+		"/Users/macadmin/Desktop/Clients/NaNoCon/ConBoard/includes/post-types/cpt-staff.php",
+		"/Users/macadmin/Desktop/Clients/NaNoCon/ConBoard/includes/post-types/cpt-session.php",
+		"/Users/macadmin/Desktop/Clients/NaNoCon/ConBoard/includes/post-types/cpt-display-board.php",
+		"/Users/macadmin/Desktop/Clients/NaNoCon/ConBoard/includes/post-types/cpt-presenter.php",
+		"/Users/macadmin/Desktop/Clients/NaNoCon/ConBoard/includes/display/params.php",
+		"/Users/macadmin/Desktop/Clients/NaNoCon/ConBoard/readme.txt",
+		"/Users/macadmin/Desktop/Clients/NaNoCon/ConBoard/includes/cpt-display-board.php",
+		"/Users/macadmin/Desktop/ae_renamer.jsx",
+		"/Users/macadmin/Desktop/ae_renamer.csv",
+		"/Users/macadmin/Desktop/Clients/TradeCraft/TradeCraft Cast Dossiers.json",
+		"/Users/macadmin/Desktop/Separate Stroke.jsx",
+		"/Users/macadmin/Desktop/Create Dropdown.jsx",
+		"/Users/macadmin/Desktop/Dropdown Preset.ffx",
+		"/Users/macadmin/Desktop/StripName.jsx",
+		"/Users/macadmin/Desktop/Clients/TradeCraft/Tradecraft Dossiers.json",
+		"/Users/macadmin/Desktop/Clients/TradeCraft/TradeCraft Cast Dossiers.jsx",
+		"/Users/macadmin/Desktop/Clients/TradeCraft/JSON Test.json",
+		"/Users/macadmin/Desktop/DisableExpressions.jsx",
+		"/Users/macadmin/Desktop/Clients/TradeCraft/TradeCraft Cast.json",
+		"/Users/macadmin/Desktop/BIRDS/Bird Database/Bird Genetics/familyTree.js",
+		"/Users/macadmin/Desktop/BIRDS/Bird Database/Bird Genetics/Tree Test.html",
+		"/Users/macadmin/Desktop/BIRDS/Bird Database/Bird Genetics/style.css",
+		"/Users/macadmin/Desktop/BIRDS/Bird Database/Bird Genetics/main.js",
+		"/Users/macadmin/Desktop/BIRDS/Bird Database/Bird Genetics/Tree of Birds v13.html",
+		"/Users/macadmin/Desktop/BIRDS/Bird Database/Bird Genetics/Colro Test.html",
+		"/Users/macadmin/Desktop/BIRDS/Bird Database/Bird Genetics/birdImages.js",
+		"/Users/macadmin/Desktop/BIRDS/Bird Database/Bird Genetics/Tree of Birds v10.html",
+		"/Users/macadmin/Desktop/BIRDS/Bird Database/Bird Genetics/Tree of Birds v08.html",
+		"/Users/macadmin/Desktop/BIRDS/Bird Database/Bird Genetics/Mutation Switches/birdGenetics.html",
+		"/Users/macadmin/Desktop/Hooligans Hours - Sheet4.csv",
+		"/Users/macadmin/Desktop/BeanStock/AEQuery.jsx",
+		"/Users/macadmin/Desktop/Personal/Bollywood Movies I've Seen",
+		"/Users/macadmin/Desktop/Jobs/Professional Summary.txt",
+		"/Users/macadmin/Desktop/vMix Feauture Requests",
+		"/Users/macadmin/Desktop/Jobs/REEL FOOTAGE",
+		"/Users/macadmin/Desktop/OPA Video Test",
+		"/Users/macadmin/Desktop/Personal/ADHD/ADHD NOTES",
+		"/Users/macadmin/Desktop/NAWA/NAWA Info.txt",
+		"/Users/macadmin/Desktop/nova/index.html",
+		"/Users/macadmin/Desktop/ConvertColor.js",
+		"/Users/macadmin/Desktop/Apple Screensaver Videos.txt",
+		"/Users/macadmin/Desktop/Shape object | After Effects Script.webloc",
+		"/Users/macadmin/Desktop/oxlohjeq62q11.png"
+	],
+	"find":
+	{
+		"height": 34.0
+	},
+	"find_in_files":
+	{
+		"height": 119.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": true,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"scrollbar_highlights": true,
+		"show_context": true,
+		"use_buffer2": true,
+		"use_gitignore": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 34.0
+	},
+	"input":
+	{
+		"height": 46.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "ConBoard.sublime-project",
+	"replace":
+	{
+		"height": 64.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 211.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
