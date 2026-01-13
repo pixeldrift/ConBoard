@@ -12,25 +12,25 @@ function conboard_admin_about() {
 	// Load the README and convert the markup to HTML
 	$readme_path = plugin_dir_path(__FILE__) . '../../README.md';
 	if (file_exists($readme_path)) {
-	    $content = file_get_contents($readme_path);
-	    echo '<div class="conboard-readme">' . conboard_markdown_to_html($content) . '</div>';
+		$content = file_get_contents($readme_path);
+		echo '<div class="conboard-readme">' . conboard_markdown_to_html($content) . '</div>';
 	} else {
-	    echo '<p>README.md not found.</p>';
+		echo '<p>README.md not found.</p>';
 	}
 
 	echo '</div>';
 	add_action('admin_head', function () {
-	    echo '<style>
+		echo '<style>
 
-	    h1.header {
-	        font-size: 40px;
-	        font-weight: bold;
-	        margin: 0;
-	    }
-	    h2.header {
-	        font-size: 20px;
-	        margin: 0 0 30px 0;
-	    }
+		h1.header {
+			font-size: 40px;
+			font-weight: bold;
+			margin: 0;
+		}
+		h2.header {
+			font-size: 20px;
+			margin: 0 0 30px 0;
+		}
 		<style>';
 	});
 }

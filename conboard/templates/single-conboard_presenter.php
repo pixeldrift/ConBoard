@@ -22,14 +22,14 @@ $socials = [];
 $socials = get_field('social_links');
 
 if ($socials) {
-    echo '<ul class="social-links">';
-    foreach ($socials as $social) {
-        $label = $social['label'] ?: ucfirst($social['platform']);
-        $url   = esc_url($social['url']);
+	echo '<ul class="social-links">';
+	foreach ($socials as $social) {
+		$label = $social['label'] ?: ucfirst($social['platform']);
+		$url   = esc_url($social['url']);
 
-        echo "<li><a href='{$url}' target='_blank' rel='noopener'>{$label}</a></li>";
-    }
-    echo '</ul>';
+		echo "<li><a href='{$url}' target='_blank' rel='noopener'>{$label}</a></li>";
+	}
+	echo '</ul>';
 }
 
 // Websites
@@ -37,14 +37,14 @@ $websites = [];
 $rows = get_field('presenter_websites', $presenter_id);
 
 if ($rows) {
-    foreach ($rows as $row) {
-        if (!empty($row['url'])) {
-            $websites[] = [
-                'url'   => $row['url'],
-                'label' => $row['label'] ?? ''
-            ];
-        }
-    }
+	foreach ($rows as $row) {
+		if (!empty($row['url'])) {
+			$websites[] = [
+				'url'   => $row['url'],
+				'label' => $row['label'] ?? ''
+			];
+		}
+	}
 }
 
 
@@ -55,115 +55,115 @@ $sessions = conboard_get_sessions_for_speaker($presenter_id);
 
 <main class="conboard conboard-presenter">
 
-    <header class="presenter-header">
+	<header class="presenter-header">
 
-        <?php if (has_post_thumbnail()) : ?>
-            <div class="presenter-photo">
-                <?php the_post_thumbnail('large'); ?>
-            </div>
-        <?php endif; ?>
+		<?php if (has_post_thumbnail()) : ?>
+			<div class="presenter-photo">
+				<?php the_post_thumbnail('large'); ?>
+			</div>
+		<?php endif; ?>
 
-        <div class="presenter-meta">
+		<div class="presenter-meta">
 
-            <h1 class="presenter-name"><?php the_title(); ?></h1>
+			<h1 class="presenter-name"><?php the_title(); ?></h1>
 
-            <?php if ($title || $org) : ?>
-                <div class="presenter-title-org">
-                    <?php if ($title) : ?>
-                        <span class="presenter-title">
-                            <?php echo esc_html($title); ?>
-                        </span>
-                    <?php endif; ?>
+			<?php if ($title || $org) : ?>
+				<div class="presenter-title-org">
+					<?php if ($title) : ?>
+						<span class="presenter-title">
+							<?php echo esc_html($title); ?>
+						</span>
+					<?php endif; ?>
 
-                    <?php if ($title && $org) : ?>
-                        <span class="separator">, </span>
-                    <?php endif; ?>
+					<?php if ($title && $org) : ?>
+						<span class="separator">, </span>
+					<?php endif; ?>
 
-                    <?php if ($org) : ?>
-                        <span class="presenter-org">
-                            <?php echo esc_html($org); ?>
-                        </span>
-                    <?php endif; ?>
-                </div>
-            <?php endif; ?>
+					<?php if ($org) : ?>
+						<span class="presenter-org">
+							<?php echo esc_html($org); ?>
+						</span>
+					<?php endif; ?>
+				</div>
+			<?php endif; ?>
 
 
-            <?php if ($email) : ?>
-                <div class="presenter-email">
-                    <a href="mailto:<?php echo esc_attr($email); ?>">
-                        <?php echo esc_html($email); ?>
-                    </a>
-                </div>
-            <?php endif; ?>
+			<?php if ($email) : ?>
+				<div class="presenter-email">
+					<a href="mailto:<?php echo esc_attr($email); ?>">
+						<?php echo esc_html($email); ?>
+					</a>
+				</div>
+			<?php endif; ?>
 
-            <?php 
-                if (!empty($socials)) {
-                    echo '<ul class="presenter-socials">';
-                    foreach ($socials as $network => $url) {
-                        printf(
-                            '<li class="social-%1$s"><a href="%2$s" target="_blank" rel="noopener">%1$s</a></li>',
-                            esc_html($network),
-                            esc_url($url)
-                        );
-                    }
-                    echo '</ul>';
-                }
+			<?php 
+				if (!empty($socials)) {
+					echo '<ul class="presenter-socials">';
+					foreach ($socials as $network => $url) {
+						printf(
+							'<li class="social-%1$s"><a href="%2$s" target="_blank" rel="noopener">%1$s</a></li>',
+							esc_html($network),
+							esc_url($url)
+						);
+					}
+					echo '</ul>';
+				}
 
-                if (!empty($websites)) {
-                    echo '<ul class="presenter-websites">';
-                    foreach ($websites as $site) {
-                        $label = $site['label'] ?: parse_url($site['url'], PHP_URL_HOST);
+				if (!empty($websites)) {
+					echo '<ul class="presenter-websites">';
+					foreach ($websites as $site) {
+						$label = $site['label'] ?: parse_url($site['url'], PHP_URL_HOST);
 
-                        printf(
-                            '<li><a href="%s" target="_blank" rel="noopener">%s</a></li>',
-                            esc_url($site['url']),
-                            esc_html($label)
-                        );
-                    }
-                    echo '</ul>';
-                }
-            ?>
-    
+						printf(
+							'<li><a href="%s" target="_blank" rel="noopener">%s</a></li>',
+							esc_url($site['url']),
+							esc_html($label)
+						);
+					}
+					echo '</ul>';
+				}
+			?>
+	
 
-        </div>
+		</div>
 
-    </header>
+	</header>
 
-    <section class="presenter-bio">
-        <?php the_content(); ?>
-    </section>
+	<section class="presenter-bio">
+		<?php the_content(); ?>
+	</section>
 
-    <?php if (!empty($sessions)) : ?>
-        <section class="presenter-sessions">
+	<?php if (!empty($sessions)) : ?>
+		<section class="presenter-sessions">
 
-            <h2>Sessions</h2>
+			<h2>Sessions</h2>
 
-            <ul class="presenter-session-list">
+			<ul class="presenter-session-list">
 
-                <?php foreach ($sessions as $session) : ?>
+				<?php foreach ($sessions as $session) : ?>
 
-                    <?php
-                    $start = get_post_meta($session->ID, 'start_time', true);
-                    ?>
+					<?php
+					$start = get_post_meta($session->ID, 'start_time', true);
+					?>
 
-                    <li class="presenter-session">
+					<li class="presenter-session">
 
-                        <time class="session-time">
-                            <?php echo esc_html(date('D g:i A', strtotime($start))); ?>
-                        </time>
+						<time class="session-time">
+							<?php echo esc_html(date('D g:i A', strtotime($start))); ?>
+						</time>
 
-                        <a href="<?php echo get_permalink($session->ID); ?>">
-                            <?php echo esc_html(get_the_title($session->ID)); ?>
-                        </a>
+						<a href="<?php echo get_permalink($session->ID); ?>">
+							<?php echo esc_html(get_the_title($session->ID)); ?>
+						</a>
 
-                    </li>
+					</li>
 
-                <?php endforeach; ?>
+				<?php endforeach; ?>
 
-            </ul>
+			</ul>
 
-        </section>
-    <?php endif; ?>
+		</section>
+	<?php endif; ?>
 
 </main>
 

@@ -14,17 +14,17 @@ if (!defined('ABSPATH')) exit;
 
 add_action( 'admin_enqueue_scripts', function ( $hook ) {
 
-    // Only load our CSS on ConBoard pages
-    // Helps avoid conflicts
-    if ( ! str_starts_with( $hook, 'conboard' ) && ! str_contains( $hook, 'conboard' ) ) {
-        return;
-    }
+	// Only load our CSS on ConBoard pages
+	// Helps avoid conflicts
+	if ( ! str_starts_with( $hook, 'conboard' ) && ! str_contains( $hook, 'conboard' ) ) {
+		return;
+	}
 
-    wp_enqueue_style(
-        'conboard-admin',
-        CONBOARD_PLUGIN_URL . 'assets/css/style.css',
-        [],
-    );
+	wp_enqueue_style(
+		'conboard-admin',
+		CONBOARD_PLUGIN_URL . 'assets/css/style.css',
+		[],
+	);
 });
 
 define('CONBOARD_PLUGIN_FILE', __FILE__);
@@ -71,20 +71,20 @@ require_once CONBOARD_PLUGIN_PATH . 'includes/display/display_qr_code.php';
 
 // Admin - Order matters
 if (is_admin()) {
-    require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_helpers.php';
-    require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_pages.php'; 
-    require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_menu.php';
-    require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_dashboard.php';
-    require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_columns.php';
-    require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_settings.php';
-    require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_markdown.php';
-        require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_list_icons.php';
-    require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_notices.php';
-    require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_about.php';
-    require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_display_board_actions.php';
-    require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_location_metaboxes.php';
-    require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_sessions_caching.php';
-    require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_session_conflicts.php';
+	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_helpers.php';
+	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_pages.php'; 
+	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_menu.php';
+	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_dashboard.php';
+	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_columns.php';
+	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_settings.php';
+	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_markdown.php';
+	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_list_icons.php';
+	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_notices.php';
+	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_about.php';
+	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_display_board_actions.php';
+	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_location_metaboxes.php';
+	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_sessions_caching.php';
+	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_session_conflicts.php';
 
 }
 
