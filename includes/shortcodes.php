@@ -16,7 +16,7 @@ add_shortcode('current_session', function ($atts) {
 		'post_type'			=> 'session',
 		'meta_query'		=> [
 			[
-				'key		=> 'location',
+				'key'		=> 'location',
 				'value'		=> $atts['location'],
 			],
 			[
