@@ -15,7 +15,7 @@ $pronouns = (string) get_post_meta($staff_id, 'pronouns', true);
 $role     = (string) get_post_meta($staff_id, 'role', true);
 $email    = (string) get_post_meta($staff_id, 'email', true);
 
-// Social and web links
+// Links
 $links_html = conboard_render_post_links($staff_id, 'staff-links');
 
 ?>

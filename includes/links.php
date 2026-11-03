@@ -1,36 +1,80 @@
 <?php
 // includes/links.php
 //
-// Social media links and web links for presenters, sponsors and staff.
+// Links (website, social media, anything else) for presenters, sponsors and staff.
+// One list per post. Each link has a type (Website, Instagram, ...), a URL and an optional label.
 // Edited with ConBoard's own row editor (no paid ACF repeater needed).
 //
-// Stored on the post as:
-//   _conboard_socials  list of [ 'platform' => string, 'url' => string, 'label' => string ]
-//   _conboard_links    list of [ 'url' => string, 'label' => string ]
+// Stored on the post as _conboard_links: a list of [ 'platform' => string, 'url' => string, 'label' => string ].
 // Posts saved by older versions (ACF repeaters named socials, links or presenter_websites)
 // are still read until the post is saved again, which converts them.
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-// Post types that have social and web links
+// Post types that have links
 function conboard_link_post_types(): array {
 	return [ 'presenter', 'sponsor', 'staff' ];
 }
 
-function conboard_get_social_platforms(): array {
-	return apply_filters( 'conboard_social_platforms', [
+// Link types: key => label
+function conboard_get_link_types(): array {
+	return apply_filters( 'conboard_link_types', [
+		'website'	=> 'Website',
+		'facebook'	=> 'Facebook',
 		'instagram'	=> 'Instagram',
 		'youtube'	=> 'YouTube',
 		'tiktok'	=> 'TikTok',
-		'facebook'	=> 'Facebook',
 		'twitter'	=> 'Twitter / X',
-		'linkedin'	=> 'LinkedIn',
-		'threads'	=> 'Threads',
 		'bluesky'	=> 'Bluesky',
+		'linkedin'	=> 'LinkedIn',
+		'substack'	=> 'Substack',
+		'threads'	=> 'Threads',
 		'mastodon'	=> 'Mastodon',
 		'twitch'	=> 'Twitch',
 		'discord'	=> 'Discord',
+		'other'		=> 'Other',
 	] );
+}
+
+// The blank links suggested on a post that has none saved yet
+function conboard_get_suggested_link_types(): array {
+	return apply_filters( 'conboard_suggested_link_types', [
+		'website', 'facebook', 'instagram', 'youtube', 'tiktok', 'twitter', 'bluesky', 'linkedin', 'substack',
+	] );
+}
+
+// Guess a link type from its address (used for links saved by older versions)
+function conboard_guess_link_type( string $url ): string {
+
+	$host = strtolower( (string) wp_parse_url( $url, PHP_URL_HOST ) );
+	$host = preg_replace( '/^(www|m|mobile)\./', '', $host );
+
+	$map = [
+		'facebook.com'	=> 'facebook',
+		'fb.com'		=> 'facebook',
+		'instagram.com'	=> 'instagram',
+		'youtube.com'	=> 'youtube',
+		'youtu.be'		=> 'youtube',
+		'tiktok.com'	=> 'tiktok',
+		'twitter.com'	=> 'twitter',
+		'x.com'			=> 'twitter',
+		'bsky.app'		=> 'bluesky',
+		'linkedin.com'	=> 'linkedin',
+		'threads.net'	=> 'threads',
+		'twitch.tv'		=> 'twitch',
+		'discord.gg'	=> 'discord',
+		'discord.com'	=> 'discord',
+	];
+
+	if ( isset( $map[ $host ] ) ) {
+		return $map[ $host ];
+	}
+
+	if ( substr( $host, -13 ) === '.substack.com' ) {
+		return 'substack';
+	}
+
+	return 'website';
 }
 
 // Rows written by the old ACF repeaters, read straight from post meta
@@ -50,10 +94,11 @@ function conboard_read_legacy_link_rows( int $post_id, string $base, array $sub_
 	return $rows;
 }
 
-function conboard_clean_link_rows( array $rows, bool $with_platform ): array {
+// Clean a list of rows: valid type, safe URL; rows without a URL are dropped
+function conboard_clean_link_rows( array $rows ): array {
 
-	$platforms = conboard_get_social_platforms();
-	$out       = [];
+	$types = conboard_get_link_types();
+	$out   = [];
 
 	foreach ( $rows as $row ) {
 		$url = esc_url_raw( trim( (string) ( $row['url'] ?? '' ) ) );
@@ -62,78 +107,137 @@ function conboard_clean_link_rows( array $rows, bool $with_platform ): array {
 			continue;
 		}
 
-		$entry = [ 'url' => $url, 'label' => trim( (string) ( $row['label'] ?? '' ) ) ];
+		$platform = (string) ( $row['platform'] ?? '' );
 
-		if ( $with_platform ) {
-			$platform = (string) ( $row['platform'] ?? '' );
-			$entry['platform'] = isset( $platforms[ $platform ] ) ? $platform : '';
+		if ( ! isset( $types[ $platform ] ) ) {
+			$platform = conboard_guess_link_type( $url );
 		}
 
-		$out[] = $entry;
+		$out[] = [ 'platform' => $platform, 'url' => $url, 'label' => trim( (string) ( $row['label'] ?? '' ) ) ];
 	}
 
 	return $out;
 }
 
-// Social links of a post: [ [ 'platform', 'url', 'label' ], ... ] (label always filled in)
-function conboard_get_socials( int $post_id ): array {
-
-	$stored = get_post_meta( $post_id, '_conboard_socials', true );
-
-	if ( ! is_array( $stored ) ) {
-		$stored = conboard_read_legacy_link_rows( $post_id, 'socials', [ 'platform', 'url', 'label' ] );
-	}
-
-	$platforms = conboard_get_social_platforms();
-	$out       = [];
-
-	foreach ( conboard_clean_link_rows( $stored, true ) as $row ) {
-		if ( $row['label'] === '' ) {
-			$row['label'] = $platforms[ $row['platform'] ] ?? ( wp_parse_url( $row['url'], PHP_URL_HOST ) ?: $row['url'] );
-		}
-		$out[] = $row;
-	}
-
-	return $out;
-}
-
-// Web links of a post: [ [ 'url', 'label' ], ... ] (label always filled in)
-function conboard_get_links( int $post_id ): array {
+// What is stored for a post, or null when nothing has ever been saved for it
+function conboard_get_stored_links( int $post_id ): ?array {
 
 	$stored = get_post_meta( $post_id, '_conboard_links', true );
 
-	if ( ! is_array( $stored ) ) {
-		$stored = array_merge(
-			conboard_read_legacy_link_rows( $post_id, 'links', [ 'url', 'label' ] ),
-			conboard_read_legacy_link_rows( $post_id, 'presenter_websites', [ 'url', 'label' ] )
-		);
+	if ( is_array( $stored ) ) {
+		return $stored;
 	}
+
+	// Links saved by older versions
+	$legacy = array_merge(
+		conboard_read_legacy_link_rows( $post_id, 'socials', [ 'platform', 'url', 'label' ] ),
+		conboard_read_legacy_link_rows( $post_id, 'links', [ 'url', 'label' ] ),
+		conboard_read_legacy_link_rows( $post_id, 'presenter_websites', [ 'url', 'label' ] )
+	);
+
+	return empty( $legacy ) ? null : $legacy;
+}
+
+// The rows shown in the editor: saved links, or the suggested blank ones for a new post
+function conboard_get_links_for_editor( int $post_id ): array {
+
+	$stored = conboard_get_stored_links( $post_id );
+
+	if ( $stored !== null ) {
+		return conboard_clean_link_rows( $stored );
+	}
+
+	return array_map(
+		fn( $type ) => [ 'platform' => $type, 'url' => '', 'label' => '' ],
+		conboard_get_suggested_link_types()
+	);
+}
+
+// The text shown for a link: its label if it has one, otherwise an @handle for sites that
+// use them, otherwise the site name or address
+function conboard_get_link_text( string $platform, string $url, string $label = '' ): string {
+
+	if ( $label !== '' ) {
+		return $label;
+	}
+
+	$parts    = wp_parse_url( $url );
+	$host     = preg_replace( '/^www\./', '', strtolower( (string) ( $parts['host'] ?? '' ) ) );
+	$segments = array_values( array_filter( explode( '/', (string) ( $parts['path'] ?? '' ) ), 'strlen' ) );
+	$handle   = '';
+
+	switch ( $platform ) {
+
+		case 'instagram':
+		case 'twitter':
+		case 'tiktok':
+		case 'threads':
+		case 'youtube':
+			// Profile pages look like /name or /@name. YouTube channels by ID have no handle.
+			$first = $segments[0] ?? '';
+			if ( $platform === 'youtube' && strpos( $first, '@' ) !== 0 ) {
+				break;
+			}
+			if ( $first !== '' && ! in_array( strtolower( ltrim( $first, '@' ) ), [ 'p', 'reel', 'explore', 'share', 'intent', 'i', 'home', 'watch' ], true ) ) {
+				$handle = '@' . ltrim( $first, '@' );
+			}
+			break;
+
+		case 'bluesky':
+			// bsky.app/profile/name.bsky.social
+			if ( ( $segments[0] ?? '' ) === 'profile' && ! empty( $segments[1] ) ) {
+				$handle = '@' . ltrim( $segments[1], '@' );
+			}
+			break;
+
+		case 'mastodon':
+			// server/@name
+			if ( strpos( $segments[0] ?? '', '@' ) === 0 ) {
+				$handle = $segments[0] . '@' . $host;
+			}
+			break;
+	}
+
+	if ( $handle !== '' ) {
+		return $handle;
+	}
+
+	$types = conboard_get_link_types();
+
+	if ( in_array( $platform, [ 'website', 'substack', 'other', '' ], true ) ) {
+		return $host !== '' ? $host : $url;
+	}
+
+	return $types[ $platform ] ?? ( $host !== '' ? $host : $url );
+}
+
+// Links of a post, ready to show: [ [ 'platform', 'url', 'label', 'text' ], ... ]
+function conboard_get_links( int $post_id ): array {
 
 	$out = [];
 
-	foreach ( conboard_clean_link_rows( $stored, false ) as $row ) {
-		if ( $row['label'] === '' ) {
-			$row['label'] = wp_parse_url( $row['url'], PHP_URL_HOST ) ?: $row['url'];
-		}
-		$out[] = $row;
+	foreach ( conboard_clean_link_rows( conboard_get_stored_links( $post_id ) ?? [] ) as $row ) {
+		$row['text'] = conboard_get_link_text( $row['platform'], $row['url'], $row['label'] );
+		$out[]       = $row;
 	}
 
 	return $out;
 }
 
-// Save a post's links (rows come from conboard_sanitize_rows)
-function conboard_save_links( int $post_id, array $socials, array $links ): void {
+// Save a post's links (rows from conboard_sanitize_rows). Blank rows are ignored.
+function conboard_save_links( int $post_id, array $rows ): void {
 
-	update_post_meta( $post_id, '_conboard_socials', conboard_clean_link_rows( $socials, true ) );
-	update_post_meta( $post_id, '_conboard_links', conboard_clean_link_rows( $links, false ) );
+	update_post_meta( $post_id, '_conboard_links', conboard_clean_link_rows( $rows ) );
 
 	conboard_delete_legacy_links( $post_id );
 }
 
-// Remove the old repeaters' meta so removed links do not come back
+// Remove the old repeaters' meta (and the short-lived _conboard_socials) so removed links do not come back
 function conboard_delete_legacy_links( int $post_id ): void {
 
 	global $wpdb;
+
+	delete_post_meta( $post_id, '_conboard_socials' );
 
 	$wpdb->query( $wpdb->prepare(
 		"DELETE FROM {$wpdb->postmeta}
@@ -145,20 +249,19 @@ function conboard_delete_legacy_links( int $post_id ): void {
 	wp_cache_delete( $post_id, 'post_meta' );
 }
 
-// Every social and web link of a post as a simple list, for templates
-// ( $extra_class is added to the <ul> ). Returns '' when there are none.
+// A post's links as a simple list for templates. Returns '' when there are none.
 function conboard_render_post_links( int $post_id, string $class = 'conboard-links' ): string {
 
-	$items = array_merge( conboard_get_socials( $post_id ), conboard_get_links( $post_id ) );
+	$links = conboard_get_links( $post_id );
 
-	if ( empty( $items ) ) {
+	if ( empty( $links ) ) {
 		return '';
 	}
 
 	$html = '<ul class="' . esc_attr( $class ) . '">';
 
-	foreach ( $items as $item ) {
-		$html .= '<li><a href="' . esc_url( $item['url'] ) . '" target="_blank" rel="noopener">' . esc_html( $item['label'] ) . '</a></li>';
+	foreach ( $links as $link ) {
+		$html .= '<li><a href="' . esc_url( $link['url'] ) . '" target="_blank" rel="noopener">' . esc_html( $link['text'] ) . '</a></li>';
 	}
 
 	return $html . '</ul>';

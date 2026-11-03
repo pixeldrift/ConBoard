@@ -17,7 +17,7 @@ $title    = get_post_meta($presenter_id, 'presenter_title', true);
 $org      = get_post_meta($presenter_id, 'presenter_organization', true);
 $email    = get_post_meta($presenter_id, 'presenter_email', true);
 
-// Social and web links
+// Links
 $links_html = conboard_render_post_links($presenter_id, 'presenter-websites');
 
 // Sessions this presenter is part of
