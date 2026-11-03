@@ -246,6 +246,12 @@ Everything in this README works today except the items below, which are describe
 - **Live preview** in the board editor.
 - Pin the current session to the top of a schedule slide, group schedule slides by track, and place overlapping sessions side by side in the grid.
 
+#### Physical Screens
+- **Screen registry:** a list of the physical displays at your venue, built from an on-site audit. Each screen gets a name, location, resolution, rotation, and a type of display unit for reference (built-in TV browser, Roku, Chromecast, Fire TV Stick, USB stick, laptop, Raspberry Pi, and so on). An optional photo can be attached as a reference.
+- **Screen cards:** a grid of all your venue screens showing which Display Board, if any, is currently assigned to each one. Drag a screen card and drop it onto a board (or a board onto a screen) to assign it.
+- **One permanent address per screen:** each registered screen gets its own URL that acts like a proxy and shows whatever is currently assigned to it. After a one-time setup of the device, you can reassign it to a different board or change its settings (rotation, clock, QR code, and so on) from the central dashboard at any time, without touching the device and without affecting any other screen. This also makes the registry more than a planning tool.
+- Overrides in the URL still win for one-off fixes on site, as they do for Display Boards.
+
 #### Scheduling
 - **Conflicts:** a visual report page, suggestions for alternate rooms, conflict warnings on Display Boards, and an option to prevent conflicts when saving.
 

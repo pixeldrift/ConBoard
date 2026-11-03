@@ -18,6 +18,7 @@ Updated Nov 3, 2026. Phases 0-3 are built (on `main`); the sections below list w
 - Program Planner (ConBoard > Program Planner): unscheduled cards, day grid with rooms as columns, drag to schedule, move, resize, unschedule (length kept), day arrows with prev/next strips; map pane (layers as drop zones, room list for maps without layers, room boxes with no map) with a red time line that follows the grid scroll, room highlights and title/time pills.
 
 ## Next
+- Screen registry: audit list of physical displays (name, location, resolution, rotation, unit type, photo), screen cards with drag-and-drop board assignment, and a permanent per-screen address that shows whatever board is assigned.
 - Conflicts: visual report page, alternate room suggestions, Display Board awareness, prevent at save (optional).
 - Display Boards Phase 4: layouts, ticker, interruptions, scheduled slides, board editor live preview.
 - Split first/last name for Presenters and Staff (decision pending).
