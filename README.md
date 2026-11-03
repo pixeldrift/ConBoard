@@ -52,7 +52,7 @@ Quick and easy digital signage already exists by default for all rooms, speakers
 
 Simply pull up any ConBoard powered page and add [`?display=screen`](?display=screen) after the web address. This will change the display template to be info board-friendly, with simplified details and a layout designed for a 16x9 screen.
 
-[`https://example.com/location/main-hall/?display=screen`](https://example.com/location/main-hall/?display=screen)
+[`https://example.com/locations/main-hall/?display=screen`](https://example.com/locations/main-hall/?display=screen)
 
 From the admin dashboard, you can open any ConBoard custom post and press the "Get Display Screen" button to retrieve the display link.
 
