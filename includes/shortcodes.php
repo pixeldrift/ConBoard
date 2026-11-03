@@ -171,6 +171,8 @@ add_shortcode( 'conboard_staff', function ( $atts ) {
 // [conboard_announcements] - latest announcements anywhere
 //
 //   limit="3"   excerpt="yes" for a short preview instead of the full text   dates="yes|no"
+//   urgent="yes"   only urgent announcements
+//   Expired announcements are hidden automatically.
 //
 add_shortcode( 'conboard_announcements', function ( $atts ) {
 
@@ -178,11 +180,13 @@ add_shortcode( 'conboard_announcements', function ( $atts ) {
 		'limit'		=> 3,
 		'excerpt'	=> 'no',
 		'dates'		=> 'yes',
+		'urgent'	=> 'no',
 	], $atts, 'conboard_announcements' );
 
 	return conboard_render_announcements([
 		'limit'		=> (int) $atts['limit'],
 		'excerpt'	=> conboard_is_truthy( $atts['excerpt'] ),
 		'show_date'	=> conboard_is_truthy( $atts['dates'] ),
+		'urgent_only'	=> conboard_is_truthy( $atts['urgent'] ),
 	]);
 });

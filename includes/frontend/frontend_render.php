@@ -567,30 +567,115 @@ function conboard_render_staff( array $args = [] ): string {
 // Announcements
 // ---------------------------------------------------------------------------
 
-// Published announcements, newest first
-function conboard_get_announcements( array $args = [] ): array {
+// Is the announcement marked urgent?
+function conboard_announcement_is_urgent( $announcement ): bool {
+	$id = $announcement instanceof WP_Post ? $announcement->ID : (int) $announcement;
 
-	$args = wp_parse_args( $args, [ 'limit' => 0 ] );
+	return (bool) get_post_meta( $id, 'urgent', true );
+}
 
-	return get_posts([
-		'post_type'			=> 'announcement',
-		'post_status'		=> 'publish',
-		'posts_per_page'	=> $args['limit'] > 0 ? (int) $args['limit'] : -1,
-		'orderby'			=> 'date',
-		'order'				=> 'DESC',
-	]);
+// Has the announcement's Expires time passed? (No expiry means it never expires.)
+function conboard_announcement_is_expired( $announcement, $now = null ): bool {
+	$id      = $announcement instanceof WP_Post ? $announcement->ID : (int) $announcement;
+	$expires = (string) get_post_meta( $id, 'expires', true );
+
+	if ( $expires === '' ) {
+		return false;
+	}
+
+	$timestamp = strtotime( $expires );
+
+	return $timestamp && $timestamp < ( $now ?: current_time( 'timestamp' ) );
+}
+
+// Is the announcement allowed on info screens? (On unless switched off.)
+function conboard_announcement_shows_on_screens( $announcement ): bool {
+	$id = $announcement instanceof WP_Post ? $announcement->ID : (int) $announcement;
+
+	return (string) get_post_meta( $id, 'show_on_screens', true ) !== '0';
 }
 
 /**
- * Announcements as a list, newest first.
+ * Published announcements, newest first (urgent ones first when $urgent_first).
  *
- * @param array $args limit, excerpt (short preview instead of the full text), show_date
+ * @param array $args {
+ *     @type string $status       active (default: not expired) | expired | all
+ *     @type bool   $urgent_only  Only urgent announcements
+ *     @type bool   $screens_only Only announcements allowed on info screens
+ *     @type bool   $urgent_first Put urgent announcements ahead of the rest (default true)
+ *     @type int    $limit        Maximum number to return (0 = no limit)
+ * }
+ */
+function conboard_get_announcements( array $args = [] ): array {
+
+	$args = wp_parse_args( $args, [
+		'status'		=> 'active',
+		'urgent_only'	=> false,
+		'screens_only'	=> false,
+		'urgent_first'	=> true,
+		'limit'			=> 0,
+	]);
+
+	$announcements = get_posts([
+		'post_type'			=> 'announcement',
+		'post_status'		=> 'publish',
+		'posts_per_page'	=> -1,
+		'orderby'			=> 'date',
+		'order'				=> 'DESC',
+	]);
+
+	$now = current_time( 'timestamp' );
+
+	$announcements = array_values( array_filter( $announcements, function ( WP_Post $post ) use ( $args, $now ) {
+
+		$expired = conboard_announcement_is_expired( $post, $now );
+
+		if ( $args['status'] === 'active' && $expired ) return false;
+		if ( $args['status'] === 'expired' && ! $expired ) return false;
+		if ( $args['urgent_only'] && ! conboard_announcement_is_urgent( $post ) ) return false;
+		if ( $args['screens_only'] && ! conboard_announcement_shows_on_screens( $post ) ) return false;
+
+		return true;
+	}));
+
+	if ( $args['urgent_first'] ) {
+		// usort is stable in PHP 8, so the newest-first order is kept within each group
+		usort( $announcements, function ( $a, $b ) {
+			return (int) conboard_announcement_is_urgent( $b ) <=> (int) conboard_announcement_is_urgent( $a );
+		});
+	}
+
+	if ( $args['limit'] > 0 ) {
+		$announcements = array_slice( $announcements, 0, (int) $args['limit'] );
+	}
+
+	return $announcements;
+}
+
+/**
+ * Announcements as a list.
+ *
+ * @param array $args limit, excerpt (short preview instead of the full text), show_date,
+ *                    status (active|expired|all), urgent_only, screens_only
  */
 function conboard_render_announcements( array $args = [] ): string {
 
-	$args = wp_parse_args( $args, [ 'limit' => 0, 'excerpt' => false, 'show_date' => true ] );
+	$args = wp_parse_args( $args, [
+		'limit'			=> 0,
+		'excerpt'		=> false,
+		'show_date'		=> true,
+		'status'		=> 'active',
+		'urgent_only'	=> false,
+		'screens_only'	=> false,
+	]);
 
-	$announcements = conboard_get_announcements([ 'limit' => $args['limit'] ]);
+	$announcements = conboard_get_announcements([
+		'limit'			=> $args['limit'],
+		'status'		=> $args['status'],
+		'urgent_only'	=> $args['urgent_only'],
+		'screens_only'	=> $args['screens_only'],
+		'urgent_first'	=> $args['status'] !== 'expired',
+	]);
 
 	if ( empty( $announcements ) ) {
 		return '';
@@ -602,7 +687,10 @@ function conboard_render_announcements( array $args = [] ): string {
 
 	foreach ( $announcements as $announcement ) {
 
-		$html .= '<article class="conboard-announcement">';
+		$urgent = conboard_announcement_is_urgent( $announcement );
+
+		$html .= '<article class="conboard-announcement' . ( $urgent ? ' conboard-announcement-urgent' : '' ) . '">';
+		$html .= $urgent ? '<span class="conboard-card-badge conboard-announcement-badge">Urgent</span>' : '';
 		$html .= '<h3 class="conboard-announcement-title"><a href="' . esc_url( get_permalink( $announcement ) ) . '">' . esc_html( get_the_title( $announcement ) ) . '</a></h3>';
 
 		if ( $args['show_date'] ) {

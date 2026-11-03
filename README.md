@@ -146,7 +146,8 @@ Drop ConBoard content into any page or post. All options are optional.
 - `[conboard_staff]`: staff photos and roles in a grid or carousel, in Display Order.
   - `layout="grid|carousel"`, `columns="4"`, `limit="8"`, `roles="yes|no"`
 - `[conboard_announcements]`: the latest announcements, newest first.
-  - `limit="3"`, `excerpt="yes"` for a short preview, `dates="yes|no"`
+  - `limit="3"`, `excerpt="yes"` for a short preview, `dates="yes|no"`, `urgent="yes"` for urgent ones only
+  - Mark an announcement **Urgent** to show it first with a label, switch **Show on Screens** off to keep it off info screens, and set **Expires** to hide it automatically.
 - `[current_session location="123"]`: what is happening now in a location.
 
 Mark presenters as **Keynote Speaker** or **Featured Presenter** on their edit screen.

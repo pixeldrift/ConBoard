@@ -313,6 +313,30 @@ function conboard_get_admin_columns_manifest(): array {
 		],
 
 
+		// Announcements
+		'announcement' => [
+			[
+				'key'		=> 'expires',
+				'label'		=> 'Expires',
+				'render'	=> function ( $post_id ) {
+					$expires = (string) get_post_meta( $post_id, 'expires', true );
+
+					if ( $expires === '' ) { echo '—'; return; }
+
+					$label = esc_html( date_i18n( 'M j, g:i a', strtotime( $expires ) ) );
+					echo conboard_announcement_is_expired( (int) $post_id ) ? '<s>' . $label . '</s> (expired)' : $label;
+				},
+			],
+			[
+				'key'		=> 'urgent',
+				'label'		=> 'Urgent',
+				'render'	=> function ( $post_id ) {
+					echo get_post_meta( $post_id, 'urgent', true ) ? '<strong>Urgent</strong>' : '—';
+				},
+			],
+		],
+
+
 		// Staff Page
 		'staff' => [
 			[
