@@ -71,6 +71,8 @@ require_once CONBOARD_PLUGIN_PATH . 'includes/display/display_context.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/display/display_hooks.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/display/display_params.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/display/display_qr_code.php';
+require_once CONBOARD_PLUGIN_PATH . 'includes/display/display_screens.php';
+require_once CONBOARD_PLUGIN_PATH . 'includes/display/display_routing.php';
 
 // Admin - Order matters
 if (is_admin()) {
@@ -86,6 +88,7 @@ if (is_admin()) {
 	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_about.php';
 	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_display_board_actions.php';
 	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_location_metaboxes.php';
+	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_screen_link.php';
 	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_sessions_caching.php';
 	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_session_conflicts.php';
 

@@ -60,6 +60,19 @@ Any of the display parameters that show up in the URL can be changed to aid in o
 
 [`?display=screen&orientation=portrait&rotate=90&flip=none`](?display=screen&orientation=portrait&rotate=90&flip=none)
 
+The screen options you can put in the URL:
+
+- `orientation=landscape|portrait`: the shape of the layout (landscape is 16x9, portrait is 9x16)
+- `rotate=0|90|180|270`: turn the whole screen clockwise, for a TV that is mounted sideways or upside down
+- `flip=none|horizontal|vertical`: mirror the screen
+- `interval=10`: seconds each page stays up when a screen loops through several pages
+- `refresh=60`: seconds between live data updates
+- `clock=yes|no` and `qr=yes|no`: show or hide the clock and the QR code
+
+Move the mouse or touch the screen to reveal the gear in the corner. It opens a small menu to go fullscreen, rotate, flip, and show or hide the clock and QR code. Changes made there only live in the address bar, so the screen is easy to fix on the spot and nothing is saved.
+
+Screens refresh themselves, so schedule changes show up without touching the display. The clock follows your website's time zone, and the QR code is drawn on the screen itself, so no outside service is needed.
+
 ## Display Boards
 
 You can also create custom Display Board content to have even more control over what is shown. A Display Board is a named, reusable configuration for a digital screen. It defines what content the screen shows, how the content behaves, and the default physical display settings.

@@ -1,7 +1,8 @@
 <?php
 // includes/display/display_qr_code.php
+//
+// QR codes are drawn in the browser by the bundled library (assets/js/vendor/qrcode.js),
+// so screens never depend on an outside service or the venue's internet connection to a
+// third party. The QR code points to the normal page: see conboard_get_screen_standard_url().
 
-function conboard_get_qr_url($post_id) {
-    $url = urlencode(get_permalink($post_id));
-    return "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={$url}";
-}
+if ( ! defined( 'ABSPATH' ) ) exit;

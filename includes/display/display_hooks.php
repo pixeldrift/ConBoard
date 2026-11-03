@@ -1,38 +1,34 @@
 <?php
 // includes/display/display_hooks.php
 
-add_filter('body_class', function ($classes) {
-    $ctx = conboard_get_display_context();
-    if (!$ctx) return $classes;
+if ( ! defined( 'ABSPATH' ) ) exit;
 
-    $classes[] = 'display-mode';
-    $classes[] = 'display-' . $ctx['display'];
-    $classes[] = 'orientation-' . $ctx['orientation'];
+//
+// Screen Mode pages are standalone (no theme header or footer), so assets are registered
+// and printed directly by the screen template rather than through wp_head().
+//
+function conboard_register_screen_assets(): void {
 
-    if ($ctx['rotation']) {
-        $classes[] = 'rotation-' . $ctx['rotation'];
-    }
+	wp_register_style(
+		'conboard-screen',
+		CONBOARD_PLUGIN_URL . 'assets/css/screen.css',
+		[],
+		'0.1.0'
+	);
 
-    return $classes;
-});
+	wp_register_script(
+		'conboard-qrcode',
+		CONBOARD_PLUGIN_URL . 'assets/js/vendor/qrcode.js',
+		[],
+		'2.0.4',
+		true
+	);
 
-add_action('wp_enqueue_scripts', function () {
-    $ctx = conboard_get_display_context();
-    if (!$ctx) return;
-
-    wp_register_script(
-        'conboard-signage',
-        CONBOARD_PLUGIN_URL . 'assets/js/signage.js',
-        [],
-        '0.1.0',
-        true
-    );
-
-    wp_enqueue_script('conboard-signage');
-
-    wp_localize_script(
-        'conboard-signage',
-        'ConBoardDisplay',
-        $ctx
-    );
-});
+	wp_register_script(
+		'conboard-signage',
+		CONBOARD_PLUGIN_URL . 'assets/js/signage.js',
+		[ 'conboard-qrcode' ],
+		'0.1.0',
+		true
+	);
+}

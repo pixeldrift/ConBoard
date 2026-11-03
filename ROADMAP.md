@@ -13,10 +13,17 @@ Derived from README.md, TODO.md and a read-through of the code (Nov 2, 2026). No
 - Remove the debug `error_log` on `acf/init`.
 
 ## Phase 1: Screen Mode
-- `signage.js` and display templates for Location, Session, Presenter, Sponsor, Staff.
-- "Get Display Screen" button in admin.
-- QR codes pointing at the standard page (currently external service, wrong URL).
-- Rotate / flip / orientation overrides; settings popup.
+Done (on `dev`):
+- `?display=screen` on any ConBoard page or list: Location (now/next + map), Session, Presenter, Sponsor, Staff, Announcement, and the Schedule, Presenters, Sponsors, Staff, Announcements and Locations lists.
+- Standalone screen page that scales a 1920x1080 stage (1080x1920 in portrait) to any display; orientation, rotate, flip, interval, refresh, clock and QR overrides in the URL.
+- Live refresh, looping pages, clock in the site time zone, locally drawn QR code, on-screen settings menu.
+- "Get Display Screen" box on every ConBoard post.
+
+Still to do:
+- Display Boards (Phase 3).
+- JPG export (Media Export) and batch export.
+- Screen links for the list pages in the admin.
+- Screen versions that use the Display Board slide timing.
 
 ## Phase 2: Time-aware core
 - Event days in global settings (Day 1 - Sunday - Jan 24 formats).

@@ -1,26 +1,24 @@
 <?php
-// includes/display/bootstrap.php
+// includes/display/display_bootstrap.php
 
-add_action('template_redirect', function () {
+if ( ! defined( 'ABSPATH' ) ) exit;
 
-    if (!conboard_is_display()) {
-        return;
-    }
+//
+// Screens always need live data, and are not for search engines or the admin bar
+//
+add_action( 'template_redirect', function () {
 
-    $schema   = conboard_display_param_schema();
-    $expected = [];
+	if ( ! conboard_is_display() ) {
+		return;
+	}
 
-    foreach ($schema as $key => $config) {
-        $expected[$key] = $_GET[$key] ?? $config['default'];
-    }
+	// Page caches must not store screens
+	if ( ! defined( 'DONOTCACHEPAGE' ) ) {
+		define( 'DONOTCACHEPAGE', true );
+	}
 
-    ksort($expected);
+	nocache_headers();
+	header( 'X-Robots-Tag: noindex, nofollow' );
 
-    $current = array_intersect_key($_GET, $expected);
-    ksort($current);
-
-    if ($expected !== $current) {
-        wp_safe_redirect(add_query_arg($expected), 302);
-        exit;
-    }
+	add_filter( 'show_admin_bar', '__return_false' );
 });

@@ -1,23 +1,23 @@
 <?php
 // includes/display/display_routing.php
 
-add_filter('template_include', function ($template) {
+if ( ! defined( 'ABSPATH' ) ) exit;
 
-    if (!conboard_is_display()) {
-        return $template;
-    }
+//
+// In Screen Mode, ConBoard pages (and their archives) use the standalone screen template.
+// Anything else, including regular WordPress pages, is left alone.
+//
+add_filter( 'template_include', function ( $template ) {
 
-    if (is_singular('location')) {
-        return CONBOARD_PLUGIN_DIR . 'templates/display/location.php';
-    }
+	if ( ! conboard_is_display() ) {
+		return $template;
+	}
 
-    if (is_singular('presenter')) {
-        return CONBOARD_PLUGIN_DIR . 'templates/display/presenter.php';
-    }
+	$types = conboard_screen_post_types();
 
-    if (is_singular('display_board')) {
-        return CONBOARD_PLUGIN_DIR . 'templates/display/board.php';
-    }
+	if ( is_singular( $types ) || is_post_type_archive( $types ) ) {
+		return CONBOARD_PLUGIN_PATH . 'templates/display/screen.php';
+	}
 
-    return $template;
-});
+	return $template;
+}, 20 );
