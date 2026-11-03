@@ -85,9 +85,31 @@ add_action( 'save_post_display_board', function ( $post_id ) {
 		return;
 	}
 
+	// If PHP cut the form off (max_input_vars), the slides arrived incomplete: keep what was saved
+	// rather than overwrite it with a partial list.
+	$limit = (int) ini_get( 'max_input_vars' );
+
+	if ( $limit > 0 && count( $_POST, COUNT_RECURSIVE ) >= $limit - 20 ) {
+		set_transient( 'conboard_board_vars_warning_' . get_current_user_id(), 1, 120 );
+		return;
+	}
+
 	$rows = conboard_sanitize_rows( wp_unslash( $_POST['conboard_slides'] ?? [] ), conboard_get_slide_editor_fields() );
 	conboard_save_board_slides( (int) $post_id, conboard_rows_to_slides( $rows ) );
 
 	$settings = wp_unslash( $_POST['conboard_board'] ?? [] );
 	update_post_meta( $post_id, '_conboard_board', conboard_sanitize_board_settings( is_array( $settings ) ? $settings : [] ) );
 });
+
+add_action( 'admin_notices', function () {
+
+	$key = 'conboard_board_vars_warning_' . get_current_user_id();
+
+	if ( ! get_transient( $key ) ) {
+		return;
+	}
+
+	delete_transient( $key );
+
+	echo '<div class="notice notice-error"><p><strong>The slides were not saved.</strong> This server limits how many form fields it accepts (<code>max_input_vars</code>), and this board has more than that. Ask your host to raise <code>max_input_vars</code> (for example to 3000), or split the board into two.</p></div>';
+} );

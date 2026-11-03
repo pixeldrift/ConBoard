@@ -37,6 +37,12 @@
 				var allowed = wrap.getAttribute( 'data-show-in' ).split( ',' );
 
 				wrap.hidden = ! ( source && allowed.indexOf( source.value ) !== -1 );
+
+				// A hidden field is not submitted. Rows list the fields of every slide type, so a long
+				// board would otherwise exceed PHP's max_input_vars and lose its last slides on save.
+				wrap.querySelectorAll( 'input, select, textarea' ).forEach( function ( input ) {
+					input.disabled = wrap.hidden;
+				} );
 			} );
 		}
 

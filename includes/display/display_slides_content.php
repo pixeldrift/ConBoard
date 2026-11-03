@@ -338,7 +338,10 @@ function conboard_sign_row_html( string $direction, string $label ): string {
 	}
 
 	$arrow = '<svg class="cb-sign-arrow" viewBox="0 0 100 100" style="transform:rotate(' . (int) $directions[ $direction ]['deg'] . 'deg)" aria-hidden="true"><path d="M50 6 L94 52 H66 V94 H34 V52 H6 Z" fill="currentColor"/></svg>';
-	$text  = '<span class="cb-sign-label">' . esc_html( $label ) . '</span>';
+	// Longer labels get smaller type so they stay on one or two lines
+	$length = function_exists( 'mb_strlen' ) ? mb_strlen( $label ) : strlen( $label );
+	$size   = $length > 28 ? ' is-small' : ( $length > 14 ? ' is-medium' : '' );
+	$text   = '<span class="cb-sign-label' . $size . '">' . esc_html( $label ) . '</span>';
 	$after = in_array( $direction, [ 'right', 'up-right', 'down-right' ], true );
 
 	return '<div class="cb-sign-row">' . ( $after ? $text . $arrow : $arrow . $text ) . '</div>';
@@ -355,8 +358,9 @@ conboard_register_slide_type( 'directional_sign', [
 	],
 	'render'	=> function ( array $s ) {
 
-		$rows = conboard_sign_row_html( (string) ( $s['direction'] ?? 'right' ), (string) ( $s['label'] ?? '' ) )
-			. conboard_sign_row_html( (string) ( $s['direction2'] ?? '' ), (string) ( $s['label2'] ?? '' ) );
+		$first  = conboard_sign_row_html( (string) ( $s['direction'] ?? 'right' ), (string) ( $s['label'] ?? '' ) );
+		$second = conboard_sign_row_html( (string) ( $s['direction2'] ?? '' ), (string) ( $s['label2'] ?? '' ) );
+		$rows   = $first . $second;
 
 		if ( $rows === '' ) {
 			return '';
@@ -364,6 +368,6 @@ conboard_register_slide_type( 'directional_sign', [
 
 		$note = (string) ( $s['note'] ?? '' );
 
-		return [ 'html' => '<div class="cb-sign">' . $rows . ( $note !== '' ? '<p class="cb-sign-note">' . esc_html( $note ) . '</p>' : '' ) . '</div>', 'url' => '' ];
+		return [ 'html' => '<div class="cb-sign' . ( $first !== '' && $second !== '' ? ' has-two' : '' ) . '">' . $rows . ( $note !== '' ? '<p class="cb-sign-note">' . esc_html( $note ) . '</p>' : '' ) . '</div>', 'url' => '' ];
 	},
 ]);
