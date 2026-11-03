@@ -87,8 +87,8 @@ conboard_register_slide_type( 'sponsors', [
 
 			foreach ( conboard_get_sponsor_groups([ 'levels' => $levels ]) as $group ) {
 				foreach ( $group['sponsors'] as $sponsor ) {
-					$website = (string) get_post_meta( $sponsor->ID, 'website', true );
-					$pages[] = [ 'html' => conboard_screen_sponsor( $sponsor ), 'url' => $website !== '' ? $website : (string) get_permalink( $sponsor ) ];
+					// The QR code goes to the sponsor's page on this site, which links on to their own sites
+					$pages[] = [ 'html' => conboard_screen_sponsor( $sponsor ), 'url' => (string) get_permalink( $sponsor ) ];
 				}
 			}
 

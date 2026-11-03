@@ -101,6 +101,7 @@ function conboard_get_screen_link_row_html( string $base_url, string $label = ''
 		<p>
 			<button type="button" class="button button-primary conboard-screen-copy">Copy link</button>
 			<a class="button conboard-screen-open" href="#" target="_blank" rel="noopener">Open</a>
+			<a class="button conboard-screen-export" href="#" target="_blank" rel="noopener" title="Opens the screen and saves it as 1920x1080 JPG pictures">Export JPG</a>
 		</p>
 
 	</div>

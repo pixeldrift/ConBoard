@@ -25,7 +25,7 @@ Still to do:
 - Screen versions that use the Display Board slide timing.
 
 ## Phase 2: Time-aware core
-- Event days in global settings (Day 1 - Sunday - Jan 24 formats). Not done.
+- DONE on dev: Event days in Settings (Day 1 - Sunday - Jan 24 formats).
 - DONE on dev: Now / Next, in-progress and starting-soon highlighting, schedule views (see docs/DISPLAY_BOARDS.md section 6).
 - Presenter repeater and column on Sessions (ACF free limits apply).
 
@@ -39,7 +39,7 @@ Still to do:
 - Conflicts: Sessions list column, visual report, alternate room suggestions, Display Board awareness.
 
 ## Phase 5: Later
-- JPG export (1920x1080) and batch export.
+- JPG export (1920x1080): done per screen or board. Batch export of many boards: still to do.
 - CSV import/export.
 - Badges and printed programs.
 - Registration and ticketing.

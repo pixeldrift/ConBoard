@@ -25,9 +25,17 @@ function conboard_register_screen_assets(): void {
 	);
 
 	wp_register_script(
+		'conboard-html-to-image',
+		CONBOARD_PLUGIN_URL . 'assets/js/vendor/html-to-image.js',
+		[],
+		'1.11.13',
+		true
+	);
+
+	wp_register_script(
 		'conboard-signage',
 		CONBOARD_PLUGIN_URL . 'assets/js/signage.js',
-		[ 'conboard-qrcode' ],
+		[ 'conboard-qrcode', 'conboard-html-to-image' ],
 		'0.1.0',
 		true
 	);

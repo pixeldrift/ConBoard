@@ -34,6 +34,25 @@ add_action( 'admin_init', function () {
 		]
 	);
 
+	register_setting(
+		'conboard_settings',
+		'conboard_event_days',
+		[
+			'type'				=> 'array',
+			'sanitize_callback'	=> 'conboard_sanitize_event_days',
+			'default'			=> conboard_get_event_days_settings(),
+		]
+	);
+});
+
+// The script for the sponsor level table (only on this page)
+add_action( 'admin_enqueue_scripts', function ( $hook ) {
+
+	if ( strpos( (string) $hook, 'conboard_settings' ) === false ) {
+		return;
+	}
+
+	wp_enqueue_script( 'conboard-sponsor-levels', CONBOARD_PLUGIN_URL . 'assets/js/sponsor_levels.js', [], '0.2.0', true );
 });
 
 // 
@@ -51,14 +70,19 @@ function conboard_sanitize_sponsor_levels( $input ) {
 		$original = sanitize_key( $row['_original'] ?? '' );
 		$slug	 = sanitize_key( $row['slug'] ?? $original );
 
+		// A new level without a slug gets one from its label
+		if ( empty( $slug ) ) {
+			$slug = sanitize_key( sanitize_title( $row['label'] ?? '' ) );
+		}
+
 		if ( empty( $slug ) ) {
 			continue;
 		}
 
 		$output[ $slug ] = [
 			'label'		=> sanitize_text_field( $row['label'] ?? '' ),
-			'singular'	=> sanitize_text_field( $row['singular'] ?? '' ),
-			'plural'	=> sanitize_text_field( $row['plural'] ?? '' ),
+			'singular'	=> sanitize_text_field( $row['singular'] ?? '' ) ?: sanitize_text_field( $row['label'] ?? '' ),
+			'plural'	=> sanitize_text_field( $row['plural'] ?? '' ) ?: sanitize_text_field( $row['label'] ?? '' ),
 			'order'		=> $order++,
 		];
 
@@ -96,106 +120,95 @@ function conboard_migrate_sponsor_level_slug( $old, $new ) {
  */
 function conboard_admin_settings(): void {
 
-	echo '<div class="wrap">';
-
-	echo '<center><img src="' . esc_url(CONBOARD_PLUGIN_URL) . '/assets/images/icon-128x128.png" style="width:128px;height:128px;margin-bottom:16px;"/>';
-
-	echo '<h1>ConBoard – Dashboard</h1>';
-
 	$levels = conboard_get_sponsor_levels_from_settings();
+	$event  = conboard_get_event_days_settings();
 
+	echo '<div class="wrap">';
+	echo '<center><img src="' . esc_url( CONBOARD_PLUGIN_URL ) . '/assets/images/icon-128x128.png" style="width:128px;height:128px;margin-bottom:16px;"/>';
+	echo '<h1>ConBoard – Settings</h1></center>';
 
-// Activate the Javascript interactive portion
-add_action('admin_enqueue_scripts', function ($hook) {
+	settings_errors();
 
-	if ($hook !== 'toplevel_page_conboard') {
-		return;
-	}
+	?>
+	<form method="post" action="options.php">
+		<?php settings_fields( 'conboard_settings' ); ?>
 
-	wp_enqueue_script(
-		'conboard-admin',
-		CONBOARD_PLUGIN_URL . '/assets/js/admin_settings.js',
-		[],
-		'1.0',
-		true
-	);
-});
+		<h2>Event Days</h2>
+		<p class="description">Used to write dates the way your event does, for example "Day 2 – Monday – Jan 25". Schedule slides can also use <code>day1</code>, <code>day2</code>, and so on as their date.</p>
 
+		<table class="form-table" role="presentation">
+			<tr>
+				<th scope="row"><label for="conboard-event-start">First day</label></th>
+				<td><input type="date" id="conboard-event-start" name="conboard_event_days[start]" value="<?php echo esc_attr( $event['start'] ); ?>"></td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="conboard-event-days">Number of days</label></th>
+				<td><input type="number" id="conboard-event-days" name="conboard_event_days[days]" min="1" max="30" value="<?php echo esc_attr( (string) $event['days'] ); ?>" class="small-text"></td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="conboard-event-format">How to write a day</label></th>
+				<td>
+					<select id="conboard-event-format" name="conboard_event_days[format]">
+						<?php foreach ( conboard_get_event_day_formats() as $key => $format ) : ?>
+							<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $event['format'], $key ); ?>><?php echo esc_html( $format['label'] ); ?></option>
+						<?php endforeach; ?>
+					</select>
+				</td>
+			</tr>
+		</table>
 
+		<hr>
+		<h2>Sponsor Levels</h2>
 
-?>
+		<table class="widefat striped" id="conboard-sponsor-levels">
+			<thead>
+				<tr>
+					<th>Label</th>
+					<th>Singular</th>
+					<th>Plural</th>
+					<th>Slug</th>
+					<th>Order</th>
+					<th colspan="2">Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+			<?php foreach ( $levels as $slug => $level ) : ?>
+				<?php $name = 'conboard_sponsor_levels[' . esc_attr( $slug ) . ']'; ?>
+				<tr data-key="<?php echo esc_attr( $slug ); ?>" data-editing="false">
 
-<hr>
-<h2>Sponsor Levels</h2>
+					<td class="display"><?php echo esc_html( $level['label'] ); ?></td>
+					<td class="display"><?php echo esc_html( $level['singular'] ); ?></td>
+					<td class="display"><?php echo esc_html( $level['plural'] ); ?></td>
+					<td class="display"><code><?php echo esc_html( $slug ); ?></code></td>
+					<td class="display"><?php echo esc_html( (string) $level['order'] ); ?></td>
+					<td class="display"><button type="button" class="button button-small conboard-edit">Edit</button></td>
+					<td><button type="button" class="button button-small conboard-delete">Delete</button></td>
 
-<table class="widefat striped" id="conboard-sponsor-levels">
-	<thead>
-		<tr>
-			<th>Label</th>
-			<th>Singular</th>
-			<th>Plural</th>
-			<th>Slug</th>
-			<th>Order</th>
-			<th colspan="2">Actions</th>
-		</tr>
-	</thead>
-	<tbody>
-	<?php foreach ( $levels as $slug => $level ) : ?>
-		<tr data-key="<?php echo esc_attr( $slug ); ?>" data-editing="false">
+					<td class="edit"><input name="<?php echo $name; ?>[label]" value="<?php echo esc_attr( $level['label'] ); ?>"></td>
+					<td class="edit"><input name="<?php echo $name; ?>[singular]" value="<?php echo esc_attr( $level['singular'] ); ?>"></td>
+					<td class="edit"><input name="<?php echo $name; ?>[plural]" value="<?php echo esc_attr( $level['plural'] ); ?>"></td>
+					<td class="edit">
+						<input name="<?php echo $name; ?>[slug]" value="<?php echo esc_attr( $slug ); ?>">
+						<input type="hidden" name="<?php echo $name; ?>[_original]" value="<?php echo esc_attr( $slug ); ?>">
+					</td>
+					<td class="edit"><?php echo esc_html( (string) $level['order'] ); ?></td>
+					<td class="edit"><button type="button" class="button button-secondary conboard-cancel">Cancel</button></td>
 
-		<!-- DISPLAY MODE -->
-			<td class="display"><?php echo esc_html( $level['label'] ); ?></td>
-			<td class="display"><?php echo esc_html( $level['singular'] ); ?></td>
-			<td class="display"><?php echo esc_html( $level['plural'] ); ?></td>
-			<td class="display"><code><?php echo esc_html( $slug ); ?></code></td>
-			<td class="display"><?php echo esc_html( $level['order'] ) ?></td>
-			<td class="display">
-				<button type="button" class="button button-small conboard-edit">Edit</button>
-			</td>
-			<td>
-				<button type="button" class="button button-small conboard-delete">Delete</button>
-			</td>
+				</tr>
+			<?php endforeach; ?>
+			</tbody>
+		</table>
 
-		<!-- EDIT MODE -->
-			<td class="edit">
-				<input name="conboard_sponsor_levels[<?php echo esc_attr($slug); ?>][label]"
-				 value="<?php echo esc_attr( $level['label'] ); ?>">
-			</td>
+		<p class="description">Levels are listed in this order on the website and screens. Deleting a level removes it from the sponsors that used it.</p>
 
-			<td class="edit">
-				<input name="conboard_sponsor_levels[<?php echo esc_attr($slug); ?>][singular]"
-				 value="<?php echo esc_attr( $level['singular'] ); ?>">
-			</td>
+		<p>
+			<button type="button" class="button" id="conboard-add-level">Add Sponsor Level</button>
+		</p>
 
-			<td class="edit">
-				<input name="conboard_sponsor_levels[<?php echo esc_attr($slug); ?>][plural]"
-				 value="<?php echo esc_attr( $level['plural'] ); ?>">
-			</td>
-
-			<td class="edit">
-				<input name="conboard_sponsor_levels[<?php echo esc_attr($slug); ?>][slug]"
-				value="<?php echo esc_attr( $slug ); ?>">
-			</td>
-			<td class="edit">
-				<input size="3" name="conboard_sponsor_levels[<?php echo esc_attr($slug); ?>][order]"
-				value="<?php echo esc_attr( $level['order'] ); ?>">
-			<td class="edit">
-				<button type="button" class="button button-secondary conboard-cancel">Cancel</button>
-			</td>
-
-	  </tr>
-	<?php endforeach; ?>
- 	</tbody>
-</table>
-
-<p>
-	<button type="button" class="button" id="conboard-add-level">
-		Add Sponsor Level
-	</button>
-</p>
-
-
-<?php
+		<?php submit_button( 'Save Settings' ); ?>
+	</form>
+	</div>
+	<?php
 }
 
 add_action('admin_head', function () {

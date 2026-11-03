@@ -38,6 +38,7 @@ require_once CONBOARD_PLUGIN_PATH . 'includes/presenter_roles.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/sponsor_levels.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/links.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/schedule.php';
+require_once CONBOARD_PLUGIN_PATH . 'includes/event_days.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/activation.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/defaults.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/shortcodes.php';

@@ -47,7 +47,7 @@ x	Page/CPT icons before page name
 
 	Add "show map" toggle to CPT that we can later use in location templates?
 
-	On main settings page, allow user to specify event dates so we can use that to convert datestamps to more human versions. Examples: (Day 1 - Sunday - Jan 24)(Day 1)(Day 1 - Sunday)
+	On main settings page, allow user to specify event dates so we can use that to convert datestamps to more human versions. Examples: (Day 1 - Sunday - Jan 24)(Day 1)(Day 1 - Sunday) (done: Settings > Event Days)
 	Should Event Days be a CPT? I don't want to, but maybe?
 
 	Let user define sponsor levels. Does that need to be a separate CPT?

@@ -8,6 +8,7 @@
  * - Loops through pages when a screen has more than one.
  * - Draws the QR code locally (no outside service).
  * - Offers a small settings menu. Changes only live in the page URL, never on the server.
+ * - Saves what is on screen as 1920x1080 JPG images (menu, or ?export=jpg in the address).
  */
 ( function () {
 	'use strict';
@@ -344,6 +345,147 @@
 	}
 
 	// ---------------------------------------------------------------------
+	// Export as JPG
+	//
+	// Each page is drawn at its design size (1920x1080, or 1080x1920 in portrait), not at the
+	// size of the display, with the screen's rotate and flip left out. The result is a still
+	// picture: no clock, and a Display Board's live announcement pages are left out of "all".
+	// ---------------------------------------------------------------------
+
+	var exporting = false;
+
+	function toast( message ) {
+		var el = byId( 'cb-toast' );
+
+		if ( ! el ) {
+			el = document.createElement( 'div' );
+			el.id = 'cb-toast';
+			document.body.appendChild( el );
+		}
+
+		el.textContent = message;
+		el.classList.add( 'is-visible' );
+
+		window.setTimeout( function () { el.classList.remove( 'is-visible' ); }, 4000 );
+	}
+
+	function download( dataUrl, name ) {
+		var link = document.createElement( 'a' );
+
+		link.href = dataUrl;
+		link.download = name;
+		document.body.appendChild( link );
+		link.click();
+		document.body.removeChild( link );
+	}
+
+	function wait( ms ) {
+		return new Promise( function ( resolve ) { window.setTimeout( resolve, ms ); } );
+	}
+
+	function exportJpg( all ) {
+		var lib = window.htmlToImage;
+
+		if ( exporting ) {
+			return Promise.resolve();
+		}
+
+		if ( ! lib || typeof lib.toJpeg !== 'function' ) {
+			toast( 'Saving pictures is not available in this browser.' );
+			return Promise.resolve();
+		}
+
+		var pages = Array.prototype.slice.call( content.querySelectorAll( '.cb-page' ) );
+		var isBoard = !! content.querySelector( '.cb-board' );
+		var indexes = [ Math.min( pageIndex, Math.max( 0, pages.length - 1 ) ) ];
+		var start = indexes[ 0 ];
+		var portrait = state.orientation === 'portrait';
+		var width = portrait ? 1080 : 1920;
+		var height = portrait ? 1920 : 1080;
+		var titleEl = byId( 'cb-title' );
+		var base = ( ( titleEl ? titleEl.textContent : '' ) || document.title || 'screen' )
+			.toLowerCase().replace( /[^a-z0-9]+/g, '-' ).replace( /^-+|-+$/g, '' ) || 'screen';
+
+		if ( all && pages.length > 1 ) {
+			indexes = [];
+			pages.forEach( function ( page, i ) {
+				if ( ! ( isBoard && page.classList.contains( 'cb-slide-announcements' ) ) ) {
+					indexes.push( i );
+				}
+			} );
+		}
+
+		if ( ! indexes.length ) {
+			indexes = [ start ];
+		}
+
+		exporting = true;
+		document.body.classList.add( 'is-exporting' );
+
+		if ( pageTimer ) {
+			window.clearTimeout( pageTimer );
+			pageTimer = null;
+		}
+
+		var saved = 0;
+		var chain = Promise.resolve();
+
+		indexes.forEach( function ( index, n ) {
+			chain = chain
+				.then( function () {
+					showPage( index );
+					return wait( 250 );
+				} )
+				.then( function () {
+					return lib.toJpeg( stage, {
+						quality: 0.92,
+						width: width,
+						height: height,
+						pixelRatio: 1,
+						backgroundColor: '#0f172a',
+						skipFonts: true,
+						style: { transform: 'none', position: 'static', margin: '0px' }
+					} );
+				} )
+				.then( function ( dataUrl ) {
+					var number = index + 1;
+					download( dataUrl, base + '-' + ( number < 10 ? '0' : '' ) + number + '.jpg' );
+					saved++;
+					return wait( 350 );
+				} );
+		} );
+
+		return chain
+			.then( function () {
+				toast( saved === 1 ? 'Saved 1 picture.' : 'Saved ' + saved + ' pictures.' );
+			} )
+			.catch( function () {
+				toast( 'Could not save the picture. Images from other websites cannot be saved.' );
+			} )
+			.then( function () {
+				exporting = false;
+				document.body.classList.remove( 'is-exporting' );
+				showPage( start );
+				startPages();
+			} );
+	}
+
+	// ?export=jpg in the address saves everything as soon as the page has loaded
+	( function () {
+		var requested = '';
+
+		try {
+			requested = new URL( window.location.href ).searchParams.get( 'export' ) || '';
+		} catch ( e ) { return; }
+
+		if ( requested === 'jpg' || requested === 'all' ) {
+			window.addEventListener( 'load', function () {
+				window.setTimeout( function () { exportJpg( true ); }, 1200 );
+			} );
+		}
+	} )();
+
+	// ---------------------------------------------------------------------
 	// Settings menu
 	// ---------------------------------------------------------------------
 
@@ -413,10 +555,18 @@
 				setParam( 'qr', state.qr ? 'yes' : 'no' );
 				break;
 
+			case 'export-page':
+				exportJpg( false );
+				return;
+
+			case 'export-all':
+				exportJpg( true );
+				return;
+
 			case 'reset':
 				try {
 					var url = new URL( window.location.href );
-					[ 'orientation', 'rotate', 'flip', 'interval', 'refresh', 'clock', 'qr' ].forEach( function ( key ) {
+					[ 'orientation', 'rotate', 'flip', 'interval', 'refresh', 'clock', 'qr', 'export' ].forEach( function ( key ) {
 						url.searchParams.delete( key );
 					} );
 					window.location.href = url.toString();

@@ -69,3 +69,11 @@ Reusable as is: scaling and orientation shell, URL overrides, refresh, QR, scree
 - These reuse the Screen Mode pages (`conboard_screen_presenter()`, `conboard_screen_session()`, sponsor and staff tiles), so a slide looks like the screen for that page.
 - A slide can produce several screens (render returns a list of pages). Each page can set `url`; the corner QR code follows the page that is showing (a session's page, a sponsor's website, a Wi-Fi join code) and returns to the default when a page has none.
 - Not yet: alternative presentation templates per type (for example a timeline view of a room schedule), randomized or weighted sponsor rotation.
+
+## 8. Event days, Settings page and JPG export
+
+- **Event days** (Settings): first day, number of days, and how a day is written (Day 1 / Day 1 – Sunday / Day 1 – Sunday – Jan 24 / Sunday / Sunday, January 24). `conboard_format_event_day()` writes dates that way (outside the event it drops the "Day N" part). Schedule slides accept `day1`, `day2`, ... as their date, and the Daily Schedule and Grid headings use the format.
+- **Settings page repaired**: it had no form or Save button, loaded a script that did not exist, and could not save new sponsor levels. It now saves event days and sponsor levels, new levels get a slug from their label, and renaming a level moves its sponsors.
+- **JPG export**: the screen menu has "Save this page as JPG" and "Save all pages as JPG"; `?export=jpg` in a screen address saves everything on load; every Display Screen box (and the Dashboard list) has an "Export JPG" button. Pictures are 1920x1080 (1080x1920 in portrait), ignore the screen's rotate/flip, hide the clock, and leave out a board's live announcement pages. Files are named `<title>-01.jpg`, `-02.jpg`, ... Built with the bundled html-to-image library (MIT, no outside service). Browsers may ask once to allow multiple downloads.
+- Limits: images hosted on other websites cannot be included; batch export of many boards at once is still to do.
+- Sponsor slides (one at a time) point their QR code to the sponsor's page on this site.

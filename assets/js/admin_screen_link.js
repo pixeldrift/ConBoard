@@ -34,9 +34,11 @@
 				var url = base + ( base.indexOf( '?' ) === -1 ? '?' : '&' ) + params;
 				var input = row.querySelector( '.conboard-screen-url' );
 				var open = row.querySelector( '.conboard-screen-open' );
+				var exportLink = row.querySelector( '.conboard-screen-export' );
 
 				if ( input ) { input.value = url; }
 				if ( open ) { open.href = url; }
+				if ( exportLink ) { exportLink.href = url + '&export=jpg'; }
 			} );
 		}
 

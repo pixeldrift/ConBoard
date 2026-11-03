@@ -53,10 +53,8 @@ function conboard_setting_flag( array $settings, string $key, bool $default = tr
 // Settings shared by the schedule slides, turned into conboard_schedule_query() arguments
 function conboard_schedule_args_from_settings( array $s, array $extra = [] ): array {
 
-	$date = trim( (string) ( $s['date'] ?? '' ) );
-
 	return array_merge([
-		'date'		=> $date === '' ? 'today' : $date,
+		'date'		=> conboard_schedule_resolve_date( $s['date'] ?? '' ),
 		'locations'	=> conboard_setting_list( $s, 'locations' ),
 		'tracks'	=> conboard_setting_list( $s, 'tracks' ),
 		'completed'	=> in_array( $s['completed'] ?? '', [ 'show', 'dim', 'hide' ], true ) ? $s['completed'] : 'hide',
@@ -69,7 +67,7 @@ function conboard_schedule_field( string $name ): array {
 	$fields = [
 		'locations'			=> [ 'label' => 'Locations', 'type' => 'multiselect', 'choices' => conboard_get_location_choices() ],
 		'tracks'			=> [ 'label' => 'Tracks (session types)', 'type' => 'multiselect', 'choices' => conboard_get_track_choices() ],
-		'date'				=> [ 'label' => 'Date (blank = today, or 2026-11-14, or all)', 'type' => 'text' ],
+		'date'				=> [ 'label' => 'Date (blank = today; or day2, 2026-11-14, all)', 'type' => 'text' ],
 		'completed'			=> [ 'label' => 'Finished sessions', 'type' => 'select', 'choices' => [ 'hide' => 'Hide', 'dim' => 'Dim', 'show' => 'Show' ] ],
 		'show_presenters'	=> [ 'label' => 'Show presenters', 'type' => 'checkbox', 'default' => '1' ],
 		'limit'				=> [ 'label' => 'How many to show', 'type' => 'number', 'min' => 1, 'max' => 20 ],
@@ -181,7 +179,7 @@ conboard_register_slide_type( 'daily_schedule', [
 
 		$options = conboard_schedule_card_options( $s, [ 'compact' => true ] );
 		$items   = array_map( fn( $r ) => conboard_schedule_item_html( $r, $options ), $rows );
-		$date    = $args['date'] === 'today' ? wp_date( 'l, F j', conboard_now() ) : ( $args['date'] === 'all' ? 'Schedule' : wp_date( 'l, F j', conboard_local_to_timestamp( $args['date'] . ' 12:00:00' ) ) );
+		$date    = $args['date'] === 'all' ? 'Schedule' : conboard_format_event_day( $args['date'] === 'today' ? conboard_now() : $args['date'] );
 
 		return conboard_schedule_heading( $date ) . conboard_schedule_list_html( $items, $args['completed'], 'cb-daily' );
 	},
@@ -367,6 +365,6 @@ conboard_register_slide_type( 'schedule_grid', [
 
 		$html .= '</div>';
 
-		return conboard_schedule_heading( $args['date'] === 'today' ? wp_date( 'l, F j', conboard_now() ) : 'Schedule' ) . '<div class="cb-sched" data-completed="dim">' . $html . '</div>';
+		return conboard_schedule_heading( $args['date'] === 'all' ? 'Schedule' : conboard_format_event_day( $args['date'] === 'today' ? conboard_now() : $args['date'] ) ) . '<div class="cb-sched" data-completed="dim">' . $html . '</div>';
 	},
 ]);

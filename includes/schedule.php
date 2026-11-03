@@ -60,6 +60,24 @@ function conboard_schedule_state( int $start, int $end, int $now, int $soon_seco
 }
 
 
+// A date setting made usable: 'today' | 'all' | 'Y-m-d'. Accepts 'day2' (event day 2, see Settings).
+function conboard_schedule_resolve_date( $date ): string {
+
+	$date = strtolower( trim( (string) $date ) );
+
+	if ( $date === '' ) {
+		return 'today';
+	}
+
+	if ( preg_match( '/^day\s*(\d+)$/', $date, $m ) ) {
+		$resolved = function_exists( 'conboard_get_event_day_date' ) ? conboard_get_event_day_date( (int) $m[1] ) : '';
+		return $resolved !== '' ? $resolved : 'today';
+	}
+
+	return ( $date === 'all' || preg_match( '/^\d{4}-\d{2}-\d{2}$/', $date ) ) ? $date : 'today';
+}
+
+
 // ---------------------------------------------------------------------------
 // Finding sessions
 // ---------------------------------------------------------------------------
@@ -133,6 +151,8 @@ function conboard_schedule_query( array $args = [] ): array {
 	], $args );
 
 	$now  = $a['now'] ? (int) $a['now'] : conboard_now();
+
+	$a['date'] = conboard_schedule_resolve_date( $a['date'] );
 	$soon = max( 0, (int) $a['soon'] ) * 60;
 
 	$query = [
