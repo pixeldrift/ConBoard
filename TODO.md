@@ -30,22 +30,22 @@ x	Add Day and Time columns to Sessions list (should this be derived and stored, 
 x	Dashboard card buttons don't work (nested in A tag), use onclick javascript instead
 x	Page/CPT icons before page name
 
-	Show live map preview from checkboxes using javascript
+x	Show live map preview from checkboxes using javascript
 
-	Title for ADD NEW pages so we know what kind of post type we are adding
+x	Title for ADD NEW pages so we know what kind of post type we are adding
 
 	Parse PSD layers the same as SVG?
-	Image based maps offer a checkbox to overlay parent, usefull for PNG highlights
+x	Image based maps offer a checkbox to overlay parent, usefull for PNG highlights
 
-	Fix column widths on CPT lists
+x	Fix column widths on CPT lists
 
-	Add Room Setup to Sessions that overrides default setup in Location
+x	Add Room Setup to Sessions that overrides default setup in Location
 
-	Handle when the SVG has changed (adding new rooms, for example) What happens to the data? Does it break? Does it default to unset if that layer no longer exists?
+x	Handle when the SVG has changed (adding new rooms, for example) What happens to the data? Does it break? Does it default to unset if that layer no longer exists?
 
-	If map deleted, revert to parent map
+x	If map deleted, revert to parent map
 
-	Add "show map" toggle to CPT that we can later use in location templates?
+x	Add "show map" toggle to CPT that we can later use in location templates?
 
 	On main settings page, allow user to specify event dates so we can use that to convert datestamps to more human versions. Examples: (Day 1 - Sunday - Jan 24)(Day 1)(Day 1 - Sunday) (done: Settings > Event Days)
 	Should Event Days be a CPT? I don't want to, but maybe?
@@ -60,14 +60,14 @@ x	Page/CPT icons before page name
 
 	Sidebar VS metabox?
 
-	Markdown: bullets for unordered lists
+x	Markdown: bullets for unordered lists
 	Split first and last name for Presenters and Staff?
 
 	Global settings
 		Conference Days
-		Default Location type
-		Default Room type
-		Default Room setup
+x		Default Location type
+x		Default Room type
+x		Default Room setup
 
 
 	Prevent room conflicts at save 

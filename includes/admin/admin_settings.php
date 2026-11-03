@@ -43,7 +43,54 @@ add_action( 'admin_init', function () {
 			'default'			=> conboard_get_event_days_settings(),
 		]
 	);
+
+	register_setting(
+		'conboard_settings',
+		'conboard_defaults',
+		[
+			'type'				=> 'array',
+			'sanitize_callback'	=> 'conboard_sanitize_defaults',
+			'default'			=> [],
+		]
+	);
 });
+
+/**
+ * Keep only default values that are real choices.
+ */
+function conboard_sanitize_defaults( $input ): array {
+
+	$input = is_array( $input ) ? $input : [];
+	$out   = [];
+
+	foreach ( conboard_get_defaults_choice_sets() as $key => $choices ) {
+		$value = isset( $input[ $key ] ) ? sanitize_key( (string) $input[ $key ] ) : '';
+		if ( $value !== '' && isset( $choices[ $value ] ) ) {
+			$out[ $key ] = $value;
+		}
+	}
+
+	return $out;
+}
+
+/**
+ * Choices for each global default (read from the Location fields so the lists stay in one place).
+ */
+function conboard_get_defaults_choice_sets(): array {
+
+	$choices = function ( string $field_key ): array {
+		$field = function_exists( 'acf_get_field' ) ? acf_get_field( $field_key ) : null;
+		$list  = is_array( $field ) && ! empty( $field['choices'] ) ? $field['choices'] : [];
+		unset( $list[''] );
+		return $list;
+	};
+
+	return [
+		'location_type'	=> $choices( 'field_location_type' ),
+		'room_type'		=> $choices( 'field_room_type' ),
+		'room_setup'	=> function_exists( 'conboard_room_setup_choices' ) ? conboard_room_setup_choices() : [],
+	];
+}
 
 // The script for the sponsor level table (only on this page)
 add_action( 'admin_enqueue_scripts', function ( $hook ) {
@@ -155,6 +202,32 @@ function conboard_admin_settings(): void {
 					</select>
 				</td>
 			</tr>
+		</table>
+
+		<hr>
+		<h2>Defaults for New Locations</h2>
+		<p class="description">Pre-selected when you add a new location. You can still change them on each location. A session can override its location's Room Setup.</p>
+
+		<table class="form-table" role="presentation">
+			<?php
+			$default_labels = [
+				'location_type'	=> 'Location type',
+				'room_type'		=> 'Room type',
+				'room_setup'	=> 'Room setup',
+			];
+			foreach ( conboard_get_defaults_choice_sets() as $key => $choices ) : ?>
+				<tr>
+					<th scope="row"><label for="conboard-default-<?php echo esc_attr( $key ); ?>"><?php echo esc_html( $default_labels[ $key ] ); ?></label></th>
+					<td>
+						<select id="conboard-default-<?php echo esc_attr( $key ); ?>" name="conboard_defaults[<?php echo esc_attr( $key ); ?>]">
+							<option value="">None</option>
+							<?php foreach ( $choices as $value => $label ) : ?>
+								<option value="<?php echo esc_attr( $value ); ?>" <?php selected( conboard_get_default_setting( $key ), (string) $value ); ?>><?php echo esc_html( $label ); ?></option>
+							<?php endforeach; ?>
+						</select>
+					</td>
+				</tr>
+			<?php endforeach; ?>
 		</table>
 
 		<hr>

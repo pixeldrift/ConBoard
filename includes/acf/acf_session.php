@@ -48,6 +48,18 @@ acf_add_local_field_group([
 			'instructions'	=> 'Keep the session listed on schedules and screens, marked as cancelled.',
 		],
 
+		[
+			'key'			=> 'field_conboard_session_room_setup',
+			'label'			=> 'Room Setup',
+			'name'			=> 'room_setup',
+			'type'			=> 'select',
+			'choices'		=> [ '' => '-Use location default-' ] + conboard_room_setup_choices(),
+			'allow_null'	=> 1,
+			'ui'			=> 1,
+			'return_format'	=> 'value',
+			'instructions'	=> 'Overrides the location\'s Default Room Setup for this session. Leave on the default to use the location\'s.',
+		],
+
 	],
 	'location' => [
 		[

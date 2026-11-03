@@ -330,3 +330,30 @@ function conboard_locate_template($template_name) {
 	$plugin_template = CONBOARD_PLUGIN_PATH . 'templates/' . $template_name;
 	return file_exists($plugin_template) ? $plugin_template : '';
 }
+
+
+/**
+ * Global defaults (Settings > Defaults): location_type, room_type, room_setup. '' = none.
+ */
+function conboard_get_default_setting( string $key ): string {
+	$defaults = get_option( 'conboard_defaults', [] );
+	return is_array( $defaults ) && isset( $defaults[ $key ] ) ? (string) $defaults[ $key ] : '';
+}
+
+/**
+ * Room setup for a session: the session's own, else its location's default, else the global default.
+ * Returns the setup slug ('' when none) - use conboard_room_setup_choices() for labels.
+ */
+function conboard_get_session_room_setup( int $session_id ): string {
+
+	$own = (string) get_post_meta( $session_id, 'room_setup', true );
+	if ( $own !== '' ) return $own;
+
+	$location_id = (int) get_post_meta( $session_id, 'location', true );
+	if ( $location_id ) {
+		$loc = (string) get_post_meta( $location_id, 'default_room_setup', true );
+		if ( $loc !== '' ) return $loc;
+	}
+
+	return conboard_get_default_setting( 'room_setup' );
+}

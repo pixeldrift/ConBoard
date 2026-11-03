@@ -34,6 +34,13 @@ $presenters  = conboard_get_session_presenters($session_id);
 		</p>
 	<?php endif; ?>
 
+	<?php
+	$setup_slug = conboard_get_session_room_setup($session_id);
+	$setup_all  = conboard_room_setup_choices();
+	if ($setup_slug && isset($setup_all[$setup_slug])) : ?>
+		<p class="session-room-setup">Room setup: <?php echo esc_html($setup_all[$setup_slug]); ?></p>
+	<?php endif; ?>
+
 	<?php if (!empty($presenters)) : ?>
 		<ul class="session-presenters">
 			<?php foreach ($presenters as $entry) : ?>

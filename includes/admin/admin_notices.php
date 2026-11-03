@@ -54,3 +54,39 @@ add_action('admin_head', function () {
 	</style>';
 });
 
+
+
+/**
+ * Titles on Add New pages.
+ *
+ * The block editor has no "Add New Session" heading, so the title field says what is being
+ * added (it feeds both editors), and the classic editor also gets the heading above the form.
+ */
+function conboard_get_post_types(): array {
+	return [ 'session', 'presenter', 'location', 'sponsor', 'staff', 'announcement', 'display_board' ];
+}
+
+add_filter( 'enter_title_here', function ( $text, $post ) {
+
+	if ( ! $post || ! in_array( $post->post_type, conboard_get_post_types(), true ) ) {
+		return $text;
+	}
+
+	$type = get_post_type_object( $post->post_type );
+	if ( ! $type ) return $text;
+
+	$singular = strtolower( $type->labels->singular_name );
+
+	return sprintf( 'Add %s name', $singular );
+}, 10, 2 );
+
+add_action( 'edit_form_top', function ( $post ) {
+
+	global $pagenow;
+	if ( $pagenow !== 'post-new.php' || ! $post || ! in_array( $post->post_type, conboard_get_post_types(), true ) ) return;
+
+	$type = get_post_type_object( $post->post_type );
+	if ( ! $type ) return;
+
+	echo '<h1 class="wp-heading-inline conboard-add-new-title">' . esc_html( $type->labels->add_new_item ) . '</h1>';
+} );

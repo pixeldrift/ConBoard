@@ -404,6 +404,14 @@ add_action('admin_head', function () {
 	echo '<style>
 		.wp-list-table .column-thumbnail { width:60px;text-align:center; }
 		.wp-list-table td, .wp-list-table th { vertical-align:middle; }
+		.wp-list-table .column-session_time, .wp-list-table .column-session_day { width:150px; }
+		.wp-list-table .column-session_location, .wp-list-table .column-presenters { width:18%; }
+		.wp-list-table .column-presenter_email, .wp-list-table .column-email, .wp-list-table .column-website { width:16%; }
+		.wp-list-table .column-presenter_title, .wp-list-table .column-role { width:14%; }
+		.wp-list-table .column-sessions, .wp-list-table .column-session_count { width:80px; text-align:center; }
+		.wp-list-table .column-location_type, .wp-list-table .column-room_type, .wp-list-table .column-default_room_setup, .wp-list-table .column-sponsor_level { width:130px; }
+		.wp-list-table .column-expires { width:130px; }
+		.wp-list-table .column-urgent { width:70px; text-align:center; }
 	</style>';
 });
 

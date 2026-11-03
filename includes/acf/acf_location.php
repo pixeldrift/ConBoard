@@ -3,6 +3,26 @@
 
 if ( ! defined('ABSPATH') ) { exit; }
 
+/**
+ * Room setup choices (used by locations and sessions)
+ */
+function conboard_room_setup_choices(): array {
+	return [
+		'banquet'	=> 'Banquet',
+		'boardroom'	=> 'Boardroom',
+		'cabaret'	=> 'Cabaret',
+		'circle'	=> 'Circle',
+		'classroom'	=> 'Classroom',
+		'cocktail'	=> 'Cocktail',
+		'empty'	=> 'Empty',
+		'hollow_square'	=> 'Hollow Square',
+		'horseshoe'	=> 'Horseshoe',
+		'semicircle'	=> 'Semicircle',
+		'theater'	=> 'Theater',
+		'workshop'	=> 'Workshop',
+	];
+}
+
 
 add_action('acf/init', function () {
 	
@@ -99,21 +119,7 @@ add_action('acf/init', function () {
 					'label'		=> 'Default Room Setup',
 					'name'		=> 'default_room_setup',
 					'type'		=> 'select',
-					'choices'	=> [
-						''				=> '-Select Room Setup-',
-						'banquet'		=> 'Banquet',
-						'boardroom'		=> 'Boardroom',
-						'cabaret'		=> 'Cabaret',
-						'circle'		=> 'Circle',
-						'classroom'		=> 'Classroom',
-						'cocktail'		=> 'Cocktail',
-						'empty'			=> 'Empty',
-						'hollow_square'	=> 'Hollow Square',
-						'horseshoe'		=> 'Horseshoe',
-						'semicircle'	=> 'Semicircle',
-						'theater'		=> 'Theater',
-						'workshop'		=> 'Workshop',
-					],
+					'choices'	=> [ '' => '-Select Room Setup-' ] + conboard_room_setup_choices(),
 					'allow_null'	=> 1,
 					'conditional_logic' => [
 						[
@@ -160,3 +166,17 @@ add_action('acf/init', function () {
 		],
 	]);
 });
+
+/**
+ * Global defaults from Settings > ConBoard: pre-select Location Type, Room Type and
+ * Room Setup on new locations (ACF only uses default_value when nothing is saved yet).
+ */
+foreach ( [ 'location_type' => 'location_type', 'room_type' => 'room_type', 'default_room_setup' => 'room_setup' ] as $field_name => $setting ) {
+	add_filter( 'acf/load_field/name=' . $field_name, function ( $field ) use ( $setting ) {
+		$value = conboard_get_default_setting( $setting );
+		if ( $value !== '' && isset( $field['choices'][ $value ] ) ) {
+			$field['default_value'] = $value;
+		}
+		return $field;
+	} );
+}

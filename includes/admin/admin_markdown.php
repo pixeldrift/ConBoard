@@ -61,7 +61,7 @@ function conboard_markdown_to_html(string $markdown): string {
 		}
 
 		// Unordered list
-		if (preg_match('/^\s*-\s+(.+)$/', $line, $m)) {
+		if (preg_match('/^\s*[-*+]\s+(.+)$/', $line, $m)) {
 			if (!$in_list) {
 				$in_list = true;
 				$html[] = '<ul>';
