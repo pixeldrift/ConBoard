@@ -142,6 +142,11 @@ function conboard_get_sessions_for_presenter( int $presenter_id ): array {
 		'orderby'			=> 'post__in',
 	]);
 
+	return conboard_sort_sessions_by_start( $sessions );
+}
+
+// Sort session posts by start time, earliest first (sessions without a start time go last)
+function conboard_sort_sessions_by_start( array $sessions ): array {
 	usort( $sessions, function ( $a, $b ) {
 		$a_start = (string) get_post_meta( $a->ID, 'start_time', true );
 		$b_start = (string) get_post_meta( $b->ID, 'start_time', true );
@@ -156,6 +161,55 @@ function conboard_get_sessions_for_presenter( int $presenter_id ): array {
 	return $sessions;
 }
 
+// IDs of every location nested inside a location (children, grandchildren, ...)
+function conboard_get_descendant_location_ids( int $location_id, int $max_depth = 10 ): array {
+	if ( $max_depth <= 0 ) {
+		return [];
+	}
+
+	$children = get_posts([
+		'post_type'			=> 'location',
+		'post_parent'		=> $location_id,
+		'post_status'		=> 'publish',
+		'posts_per_page'	=> -1,
+		'fields'			=> 'ids',
+	]);
+
+	$ids = [];
+
+	foreach ( $children as $child_id ) {
+		$ids[] = (int) $child_id;
+		$ids   = array_merge( $ids, conboard_get_descendant_location_ids( (int) $child_id, $max_depth - 1 ) );
+	}
+
+	return array_values( array_unique( $ids ) );
+}
+
+// Published sessions held at a location, earliest first.
+// With $include_children, sessions in rooms/floors nested inside it are included too.
+function conboard_get_sessions_for_location( int $location_id, bool $include_children = true ): array {
+	$location_ids = [ $location_id ];
+
+	if ( $include_children ) {
+		$location_ids = array_merge( $location_ids, conboard_get_descendant_location_ids( $location_id ) );
+	}
+
+	$sessions = get_posts([
+		'post_type'			=> 'session',
+		'post_status'		=> 'publish',
+		'posts_per_page'	=> -1,
+		'meta_query'		=> [
+			[
+				'key'		=> 'location',
+				'value'		=> array_map( 'strval', $location_ids ),
+				'compare'	=> 'IN',
+			],
+		],
+	]);
+
+	return conboard_sort_sessions_by_start( $sessions );
+}
+
 // The role a presenter has in a particular session (e.g. "speaker", "moderator")
 function conboard_get_presenter_role_in_session( int $session_id, int $presenter_id ): string {
 	foreach ( conboard_get_session_presenters( $session_id ) as $entry ) {
@@ -168,12 +222,15 @@ function conboard_get_presenter_role_in_session( int $session_id, int $presenter
 }
 
 
-// Compare session time with current time
+// Compare session time with current time: 'past', 'current', 'upcoming' or 'unscheduled'
 function conboard_get_session_state($session_id, $now = null) {
 	$now = $now ?: current_time('timestamp');
 
-	$start = strtotime(get_field('start_time', $session_id));
-	$end   = strtotime(get_field('end_time', $session_id));
+	$start = strtotime( (string) get_field('start_time', $session_id) );
+	$end   = strtotime( (string) get_field('end_time', $session_id) );
+
+	if (!$start) return 'unscheduled';
+	if (!$end)   $end = $start;
 
 	if ($end < $now) return 'past';
 	if ($start <= $now && $end >= $now) return 'current';
