@@ -277,6 +277,15 @@
 					return;
 				}
 
+				// The server's settings for this screen changed (for example it was assigned
+				// another Display Board with different rotation or timing): start over with them
+				var stage = byId( 'cb-stage' );
+				var freshStage = doc.getElementById( 'cb-stage' );
+				if ( stage && freshStage && stage.getAttribute( 'data-sig' ) && freshStage.getAttribute( 'data-sig' ) !== stage.getAttribute( 'data-sig' ) ) {
+					window.location.reload();
+					return;
+				}
+
 				content.innerHTML = fresh.innerHTML;
 
 				var title = doc.getElementById( 'cb-title' );

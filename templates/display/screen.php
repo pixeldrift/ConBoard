@@ -41,7 +41,7 @@ wp_add_inline_script( 'conboard-signage', 'window.ConBoardScreen = ' . wp_json_e
 
 	<div id="cb-viewport">
 
-		<div id="cb-stage" class="is-<?php echo esc_attr( $ctx['orientation'] ); ?><?php echo $ctx['clock'] ? '' : ' no-clock'; ?><?php echo $ctx['qr'] ? '' : ' no-qr'; ?>">
+		<div id="cb-stage" data-sig="<?php echo esc_attr( md5( wp_json_encode( $config ) ) ); ?>" class="is-<?php echo esc_attr( $ctx['orientation'] ); ?><?php echo $ctx['clock'] ? '' : ' no-clock'; ?><?php echo $ctx['qr'] ? '' : ' no-qr'; ?>">
 
 			<div id="cb-sync" data-state="live" hidden aria-live="polite">
 				<svg class="cb-sync-offline" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 8.8a15 15 0 0 1 20 0M5.5 12.4a10 10 0 0 1 13 0M9 16a5 5 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="19.5" r="1.6" fill="currentColor"/><path d="M3 3l18 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>

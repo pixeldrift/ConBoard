@@ -67,6 +67,7 @@ require_once CONBOARD_PLUGIN_PATH . 'includes/post-types/cpt_location.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/post-types/cpt_session.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/post-types/cpt_sponsor.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/post-types/cpt_staff.php';
+require_once CONBOARD_PLUGIN_PATH . 'includes/post-types/cpt_screen.php';
 
 // Display System - Order matters
 require_once CONBOARD_PLUGIN_PATH . 'includes/display/display_bootstrap.php';
@@ -78,6 +79,7 @@ require_once CONBOARD_PLUGIN_PATH . 'includes/display/display_screens.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/display/display_slides.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/display/display_slides_schedule.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/display/display_slides_content.php';
+require_once CONBOARD_PLUGIN_PATH . 'includes/screens.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/display/display_routing.php';
 
 // Admin - Order matters
@@ -102,6 +104,7 @@ if (is_admin()) {
 	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_session_conflicts.php';
 	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_planner.php';
 	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_export_boards.php';
+	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_screens.php';
 
 }
 
