@@ -12,8 +12,10 @@ Updated Nov 3, 2026. Phases 0-3 are built (on `main`); the sections below list w
 - Maps: live layer preview, parent-map fallback, Show Map toggle, overlay + labels stack for image maps.
 - Admin polish: Add New titles, column widths, per-session Room Setup, global defaults, Markdown bullets.
 - Conflict column in the Sessions list.
+- Program Planner step 1 (ConBoard > Program Planner): unscheduled cards, day grid with rooms as columns, drag to schedule, move, resize, unschedule (length kept), day arrows with prev/next strips.
 
 ## Next
+- Program Planner step 2: map pane (layers as drop zones; map without layers + room list; no map = room boxes), room highlight with title and times.
 - Conflicts: visual report page, alternate room suggestions, Display Board awareness, prevent at save (optional).
 - Display Boards Phase 4: layouts, ticker, interruptions, scheduled slides, board editor live preview.
 - Split first/last name for Presenters and Staff (decision pending).

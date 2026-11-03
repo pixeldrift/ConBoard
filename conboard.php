@@ -99,6 +99,7 @@ if (is_admin()) {
 	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_links_metabox.php';
 	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_sessions_caching.php';
 	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_session_conflicts.php';
+	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_planner.php';
 
 }
 
