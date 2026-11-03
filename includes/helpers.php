@@ -53,7 +53,34 @@ function conboard_get_presenter_role_label( string $role, string $form = 'singul
 	return $roles[ $role ][ $form ] ?? ucfirst( $role );
 }
 
+// Normalize a post ID, WP_Post, or an array of either (e.g. an ACF relationship value) into unique int IDs
+function conboard_normalize_ids( $value ): array {
+
+	if ( empty( $value ) ) {
+		return [];
+	}
+
+	if ( ! is_array( $value ) ) {
+		$value = [ $value ];
+	}
+
+	$ids = [];
+
+	foreach ( $value as $item ) {
+		if ( $item instanceof WP_Post ) {
+			$item = $item->ID;
+		}
+
+		if ( is_numeric( $item ) && (int) $item > 0 ) {
+			$ids[] = (int) $item;
+		}
+	}
+
+	return array_values( array_unique( $ids ) );
+}
+
 // Get structured presenters for a session
+// (the "presenter" sub-field is a relationship, so it can hold more than one ID)
 function conboard_get_session_presenters( int $session_id ): array {
 	$rows = get_field( 'presenters', $session_id );
 	if ( ! is_array( $rows ) ) {
@@ -63,35 +90,81 @@ function conboard_get_session_presenters( int $session_id ): array {
 	$out = [];
 
 	foreach ( $rows as $row ) {
-		if ( empty( $row['presenter'] ) ) {
-			continue;
-		}
+		$role = ! empty( $row['role'] ) ? $row['role'] : conboard_get_default_presenter_role();
 
-		$out[] = [
-			'presenter_id' => (int) $row['presenter'],
-			'role'		 => $row['role'] ?? conboard_get_default_presenter_role(),
-		];
+		foreach ( conboard_normalize_ids( $row['presenter'] ?? null ) as $presenter_id ) {
+			$out[] = [
+				'presenter_id'	=> $presenter_id,
+				'role'			=> $role,
+			];
+		}
 	}
 
 	return $out;
 }
 
-// Return a list of sessions for a given presenter
-function conboard_get_sessions_for_presenter($presenter_id) {
-	return new WP_Query([
-		'post_type' => 'session',
-		'meta_query' => [
-			[
-				'key' => 'participants',
-				'value' => '"' . $presenter_id . '"',
-				'compare' => 'LIKE',
-			],
-		],
-		'posts_per_page' => -1,
-		'orderby' => 'meta_value',
-		'meta_key' => 'start_time',
-		'order' => 'ASC',
+// IDs of published sessions that list a given presenter
+// ACF stores repeater rows as presenters_0_presenter, presenters_1_presenter, ...
+function conboard_get_session_ids_for_presenter( int $presenter_id ): array {
+	global $wpdb;
+
+	$key_like   = $wpdb->esc_like( 'presenters_' ) . '%' . $wpdb->esc_like( '_presenter' );
+	$value_like = '%' . $wpdb->esc_like( '"' . $presenter_id . '"' ) . '%';
+
+	$sql = $wpdb->prepare(
+		"SELECT DISTINCT pm.post_id
+		 FROM {$wpdb->postmeta} pm
+		 INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
+		 WHERE p.post_type = 'session'
+		   AND p.post_status = 'publish'
+		   AND pm.meta_key LIKE %s
+		   AND ( pm.meta_value = %s OR pm.meta_value LIKE %s )",
+		$key_like,
+		(string) $presenter_id,
+		$value_like
+	);
+
+	return array_map( 'intval', $wpdb->get_col( $sql ) );
+}
+
+// Published sessions for a given presenter, earliest first (sessions without a start time go last)
+function conboard_get_sessions_for_presenter( int $presenter_id ): array {
+	$ids = conboard_get_session_ids_for_presenter( $presenter_id );
+
+	if ( empty( $ids ) ) {
+		return [];
+	}
+
+	$sessions = get_posts([
+		'post_type'			=> 'session',
+		'post__in'			=> $ids,
+		'posts_per_page'	=> -1,
+		'orderby'			=> 'post__in',
 	]);
+
+	usort( $sessions, function ( $a, $b ) {
+		$a_start = (string) get_post_meta( $a->ID, 'start_time', true );
+		$b_start = (string) get_post_meta( $b->ID, 'start_time', true );
+
+		if ( $a_start === $b_start ) return 0;
+		if ( $a_start === '' ) return 1;
+		if ( $b_start === '' ) return -1;
+
+		return strcmp( $a_start, $b_start );
+	});
+
+	return $sessions;
+}
+
+// The role a presenter has in a particular session (e.g. "speaker", "moderator")
+function conboard_get_presenter_role_in_session( int $session_id, int $presenter_id ): string {
+	foreach ( conboard_get_session_presenters( $session_id ) as $entry ) {
+		if ( $entry['presenter_id'] === $presenter_id ) {
+			return (string) $entry['role'];
+		}
+	}
+
+	return conboard_get_default_presenter_role();
 }
 
 

@@ -12,15 +12,15 @@ acf_add_local_field_group([
 	'fields' => [
 
 		[
-			'key'			=> 'field_conboard_session_room',
-			'label'			=> 'Room',
-			'name'			=> 'room',
+			'key'			=> 'field_conboard_session_location',
+			'label'			=> 'Location',
+			'name'			=> 'location',
 			'type'			=> 'post_object',
-			'post_type'		=> [ 'room' ],
+			'post_type'		=> [ 'location' ],
 			'return_format'	=> 'id',
 			'ui'			=> 1,
 			'required'		=> 1,
-			'instructions'	=> 'Select the room where this session takes place.',
+			'instructions'	=> 'Select the location where this session takes place.',
 		],
 
 		[

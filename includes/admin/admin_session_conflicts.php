@@ -6,7 +6,17 @@ if ( ! defined('ABSPATH') ) exit;
 //
 // Detect location conflicts when saving a session
 //
-add_action('save_post_session', 'conboard_check_session_location_conflicts', 20, 3);
+// Runs on acf/save_post (after ACF has written the new values), not save_post_session,
+// which fires earlier and would see the previous values.
+add_action('acf/save_post', function ( $post_id ) {
+
+	if ( ! is_numeric($post_id) || get_post_type($post_id) !== 'session' ) {
+		return;
+	}
+
+	conboard_check_session_location_conflicts( (int) $post_id, get_post($post_id), true );
+
+}, 20);
 
 function conboard_check_session_location_conflicts( $post_id, $post, $update ) {
 

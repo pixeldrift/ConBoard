@@ -11,10 +11,11 @@ add_filter('template_include', function ($template) {
 
 	// Keys are the registered post type slugs (see includes/post-types/).
 	// Only templates that are ready for use are mapped here. Others (announcement,
-	// display_board, location, sponsor, staff, single presenter) are still stubs
+	// display_board, location, sponsor, staff) are still stubs
 	// or need rework, so the theme's own templates handle them for now.
 	$templates = [
 		'presenter' => [
+			'single'	=> 'single-conboard_presenter.php',
 			'archive'	=> 'archive-conboard_presenter.php',
 		],
 		'session' => [

@@ -12,44 +12,28 @@ the_post();
 $presenter_id = get_the_ID();
 
 // Meta
-$title = get_post_meta($presenter_id, 'presenter_title', true);
-$org   = get_post_meta($presenter_id, 'presenter_org', true);
-$email = get_post_meta($presenter_id, 'presenter_email', true);
-
-
-// Socials
-$socials = [];
-$socials = get_field('social_links');
-
-if ($socials) {
-	echo '<ul class="social-links">';
-	foreach ($socials as $social) {
-		$label = $social['label'] ?: ucfirst($social['platform']);
-		$url   = esc_url($social['url']);
-
-		echo "<li><a href='{$url}' target='_blank' rel='noopener'>{$label}</a></li>";
-	}
-	echo '</ul>';
-}
+$pronouns = get_post_meta($presenter_id, 'pronouns', true);
+$title    = get_post_meta($presenter_id, 'presenter_title', true);
+$org      = get_post_meta($presenter_id, 'presenter_organization', true);
+$email    = get_post_meta($presenter_id, 'presenter_email', true);
 
 // Websites
 $websites = [];
 $rows = get_field('presenter_websites', $presenter_id);
 
-if ($rows) {
+if (is_array($rows)) {
 	foreach ($rows as $row) {
 		if (!empty($row['url'])) {
 			$websites[] = [
 				'url'   => $row['url'],
-				'label' => $row['label'] ?? ''
+				'label' => $row['label'] ?? '',
 			];
 		}
 	}
 }
 
-
-// Sessions
-$sessions = conboard_get_sessions_for_speaker($presenter_id);
+// Sessions this presenter is part of
+$sessions = conboard_get_sessions_for_presenter($presenter_id);
 
 ?>
 
@@ -67,12 +51,14 @@ $sessions = conboard_get_sessions_for_speaker($presenter_id);
 
 			<h1 class="presenter-name"><?php the_title(); ?></h1>
 
+			<?php if ($pronouns) : ?>
+				<div class="presenter-pronouns"><?php echo esc_html($pronouns); ?></div>
+			<?php endif; ?>
+
 			<?php if ($title || $org) : ?>
 				<div class="presenter-title-org">
 					<?php if ($title) : ?>
-						<span class="presenter-title">
-							<?php echo esc_html($title); ?>
-						</span>
+						<span class="presenter-title"><?php echo esc_html($title); ?></span>
 					<?php endif; ?>
 
 					<?php if ($title && $org) : ?>
@@ -80,13 +66,10 @@ $sessions = conboard_get_sessions_for_speaker($presenter_id);
 					<?php endif; ?>
 
 					<?php if ($org) : ?>
-						<span class="presenter-org">
-							<?php echo esc_html($org); ?>
-						</span>
+						<span class="presenter-org"><?php echo esc_html($org); ?></span>
 					<?php endif; ?>
 				</div>
 			<?php endif; ?>
-
 
 			<?php if ($email) : ?>
 				<div class="presenter-email">
@@ -96,34 +79,18 @@ $sessions = conboard_get_sessions_for_speaker($presenter_id);
 				</div>
 			<?php endif; ?>
 
-			<?php 
-				if (!empty($socials)) {
-					echo '<ul class="presenter-socials">';
-					foreach ($socials as $network => $url) {
-						printf(
-							'<li class="social-%1$s"><a href="%2$s" target="_blank" rel="noopener">%1$s</a></li>',
-							esc_html($network),
-							esc_url($url)
-						);
-					}
-					echo '</ul>';
-				}
-
-				if (!empty($websites)) {
-					echo '<ul class="presenter-websites">';
-					foreach ($websites as $site) {
-						$label = $site['label'] ?: parse_url($site['url'], PHP_URL_HOST);
-
-						printf(
-							'<li><a href="%s" target="_blank" rel="noopener">%s</a></li>',
-							esc_url($site['url']),
-							esc_html($label)
-						);
-					}
-					echo '</ul>';
-				}
-			?>
-	
+			<?php if (!empty($websites)) : ?>
+				<ul class="presenter-websites">
+					<?php foreach ($websites as $site) : ?>
+						<?php $label = $site['label'] ?: parse_url($site['url'], PHP_URL_HOST); ?>
+						<li>
+							<a href="<?php echo esc_url($site['url']); ?>" target="_blank" rel="noopener">
+								<?php echo esc_html($label ?: $site['url']); ?>
+							</a>
+						</li>
+					<?php endforeach; ?>
+				</ul>
+			<?php endif; ?>
 
 		</div>
 
@@ -144,17 +111,24 @@ $sessions = conboard_get_sessions_for_speaker($presenter_id);
 
 					<?php
 					$start = get_post_meta($session->ID, 'start_time', true);
+					$role  = conboard_get_presenter_role_in_session($session->ID, $presenter_id);
 					?>
 
 					<li class="presenter-session">
 
-						<time class="session-time">
-							<?php echo esc_html(date('D g:i A', strtotime($start))); ?>
-						</time>
+						<?php if ($start) : ?>
+							<time class="session-time">
+								<?php echo esc_html(date_i18n('D g:i A', strtotime($start))); ?>
+							</time>
+						<?php endif; ?>
 
-						<a href="<?php echo get_permalink($session->ID); ?>">
+						<a href="<?php echo esc_url(get_permalink($session->ID)); ?>">
 							<?php echo esc_html(get_the_title($session->ID)); ?>
 						</a>
+
+						<span class="presenter-role">
+							(<?php echo esc_html(conboard_get_presenter_role_label($role)); ?>)
+						</span>
 
 					</li>
 
