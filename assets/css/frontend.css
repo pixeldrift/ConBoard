@@ -188,3 +188,12 @@ a.conboard-card:focus .conboard-card-name {
 	padding-left: 1rem;
 	border-left: 4px solid currentColor;
 }
+
+/* Map stack: base map, then a transparent room highlight, then labels on top */
+.conboard-map-stack { position: relative; }
+.conboard-map-stack > svg,
+.conboard-map-stack > img.conboard-map-image { display: block; }
+.conboard-map-stack > img.conboard-map-overlay {
+	position: absolute; inset: 0; width: 100%; height: 100%;
+	max-width: none; object-fit: contain; pointer-events: none;
+}

@@ -343,3 +343,12 @@ body.is-awake #cb-menu { opacity: 1; }
 	font: 16px/1.3 system-ui, sans-serif; opacity: 0; pointer-events: none; transition: opacity .3s; z-index: 20;
 }
 #cb-toast.is-visible { opacity: 1; }
+
+/* Map stack: base map, then a transparent room highlight, then labels on top */
+.conboard-map-stack { position: relative; }
+.conboard-map-stack > svg,
+.conboard-map-stack > img.conboard-map-image { display: block; }
+.conboard-map-stack > img.conboard-map-overlay {
+	position: absolute; inset: 0; width: 100%; height: 100%;
+	max-width: none; object-fit: contain; pointer-events: none;
+}

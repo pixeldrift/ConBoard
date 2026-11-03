@@ -43,72 +43,6 @@ function conboard_get_location_map_layers( int $location_id ): array {
 	return $layers;
 }
 
-// -------------------------
-// Checkbox layer logic
-// -------------------------
-add_filter(
-	'acf/load_field/name=' . CONBOARD_LOCATION_MAP_LAYER_FIELD,
-	function ( $field ) {
-
-		$post_id = isset( $_GET['post'] ) ? (int) $_GET['post'] : 0;
-		if ( ! $post_id ) return $field;
-
-		// Populate choices
-		$field['choices'] = conboard_get_location_map_layers( $post_id );
-
-		// If no value saved yet, inherit from parent
-		$current = get_post_meta( $post_id, CONBOARD_LOCATION_MAP_LAYER_FIELD, true );
-		if ( empty( $current ) ) {
-			$field['value'] = conboard_get_inherited_map_layers( $post_id );
-		}
-
-		return $field;
-	},
-	100
-);
-
-/**
- * Show a preview of the assigned map (or inherited map) below the field.
- */
-add_action('acf/render_field/key=field_location_map', function($field){
-	$post_id = get_the_ID();
-	$map_field = get_field('location_map', $post_id);
-
-	if (!$map_field) {
-		$source_id = conboard_get_location_map_source($post_id);
-		$map_field = $source_id ? get_field('location_map', $source_id) : null;
-	}
-
-	if ($map_field) {
-		$url = is_numeric($map_field)
-			? wp_get_attachment_url($map_field)
-			: (is_array($map_field) && isset($map_field['url']) ? $map_field['url'] : $map_field);
-
-		echo '<div class="conboard-map-layout">';
-
-		echo '<div class="conboard-map-preview">';
-		echo '<strong>Map Preview</strong><br>';
-		echo '<img src="' . esc_url($url) . '" />';
-		echo '</div>';
-
-		echo '<div class="conboard-map-layers">';
-		echo '<strong>Layers for this Location</strong>';
-		echo '<p style="margin:6px 0 10px;color:#666;">Select which SVG layers are visible for this location.</p>';
-		// DO NOT CLOSE DIV YET, must insert checkbox list first
-	}
-});
-
-add_action('acf/render_field/key=field_location_map_layer', function($field){
-
-	// Let ACF render the checkboxes normally
-	// Then close the layout wrapper
-
-	echo '</div>'; // .conboard-map-layers
-	echo '</div>'; // .conboard-map-layout
-});
-
-
-
 /**
  * Human-readable label for a select field value (e.g. location_type "room" -> "Room")
  */
@@ -127,29 +61,15 @@ function conboard_get_field_choice_label( string $field_name, $value, int $post_
 }
 
 /**
- * Front-end map for a location.
+ * Sanitized inline markup for an SVG attachment.
  *
- * - Uses the location's own map, or inherits the nearest parent's map.
- * - SVG maps are output inline and sanitized, showing only the layers assigned to this
- *   location (inherited from a parent if none are assigned). If no assigned layer exists
- *   in the file (for example the SVG was replaced), the whole map is shown.
- * - Image maps (PNG/JPG) are output as a normal image.
+ * @param int        $map_id    SVG attachment id
+ * @param string     $label     accessible label
+ * @param array|null $selected  layer ids to show; null leaves every layer visible
+ *                              (used by the admin preview, which toggles them in JS).
+ *                              If none of the ids exist in the file, the whole map shows.
  */
-function conboard_get_location_map_html( int $location_id ): string {
-
-	$source_id = conboard_get_location_map_source( $location_id );
-	if ( ! $source_id ) return '';
-
-	$map_id = (int) get_post_meta( $source_id, CONBOARD_LOCATION_MAP_FIELD, true );
-	if ( ! $map_id ) return '';
-
-	$label = esc_attr( sprintf( 'Map of %s', get_the_title( $location_id ) ) );
-
-	// Raster maps
-	if ( get_post_mime_type( $map_id ) !== 'image/svg+xml' ) {
-		$img = wp_get_attachment_image( $map_id, 'large', false, [ 'class' => 'conboard-map-image', 'alt' => $label ] );
-		return $img ? '<div class="conboard-location-map">' . $img . '</div>' : '';
-	}
+function conboard_get_svg_markup( int $map_id, string $label, ?array $selected = null ): string {
 
 	$path = get_attached_file( $map_id );
 	if ( ! $path || ! file_exists( $path ) ) return '';
@@ -192,21 +112,22 @@ function conboard_get_location_map_html( int $location_id ): string {
 		}
 	}
 
-	// Show only the layers assigned to this location
-	$layer_nodes = [];
-	foreach ( $root->childNodes as $node ) {
-		if ( $node instanceof DOMElement && strtolower( $node->localName ) === 'g' && $node->getAttribute( 'id' ) !== '' ) {
-			$layer_nodes[ $node->getAttribute( 'id' ) ] = $node;
+	// Show only the chosen layers
+	if ( $selected !== null ) {
+		$layer_nodes = [];
+		foreach ( $root->childNodes as $node ) {
+			if ( $node instanceof DOMElement && strtolower( $node->localName ) === 'g' && $node->getAttribute( 'id' ) !== '' ) {
+				$layer_nodes[ $node->getAttribute( 'id' ) ] = $node;
+			}
 		}
-	}
 
-	$selected = array_map( 'strval', conboard_get_inherited_map_layers( $location_id ) );
-	$selected = array_intersect( $selected, array_keys( $layer_nodes ) );
+		$selected = array_intersect( array_map( 'strval', $selected ), array_map( 'strval', array_keys( $layer_nodes ) ) );
 
-	if ( ! empty( $selected ) ) {
-		foreach ( $layer_nodes as $id => $node ) {
-			if ( ! in_array( (string) $id, $selected, true ) ) {
-				$node->setAttribute( 'style', trim( $node->getAttribute( 'style' ) . ';display:none', ';' ) );
+		if ( ! empty( $selected ) ) {
+			foreach ( $layer_nodes as $id => $node ) {
+				if ( ! in_array( (string) $id, $selected, true ) ) {
+					$node->setAttribute( 'style', trim( $node->getAttribute( 'style' ) . ';display:none', ';' ) );
+				}
 			}
 		}
 	}
@@ -221,9 +142,72 @@ function conboard_get_location_map_html( int $location_id ): string {
 	}
 	$root->removeAttribute( 'width' );
 	$root->removeAttribute( 'height' );
-	$root->setAttribute( 'style', trim( $root->getAttribute( 'style' ) . ';max-width:100%;height:auto', ';' ) );
+	$root->setAttribute( 'style', trim( $root->getAttribute( 'style' ) . ';max-width:100%;height:auto;display:block', ';' ) );
 	$root->setAttribute( 'role', 'img' );
-	$root->setAttribute( 'aria-label', sanitize_text_field( sprintf( 'Map of %s', get_the_title( $location_id ) ) ) );
+	$root->setAttribute( 'aria-label', sanitize_text_field( $label ) );
 
-	return '<div class="conboard-location-map">' . $dom->saveXML( $root ) . '</div>';
+	return $dom->saveXML( $root );
+}
+
+/**
+ * Markup for one map layer image (SVG inline, raster as <img>)
+ */
+function conboard_get_map_base_markup( int $map_id, string $label, ?array $selected = null ): string {
+
+	if ( get_post_mime_type( $map_id ) === 'image/svg+xml' ) {
+		return conboard_get_svg_markup( $map_id, $label, $selected );
+	}
+
+	return (string) wp_get_attachment_image( $map_id, 'large', false, [ 'class' => 'conboard-map-image', 'alt' => esc_attr( $label ) ] );
+}
+
+/**
+ * A decorative image laid over the base (highlights, labels)
+ */
+function conboard_get_map_overlay_img( int $attachment_id, string $class ): string {
+	$url = wp_get_attachment_url( $attachment_id );
+	if ( ! $url ) return '';
+	return '<img class="conboard-map-overlay ' . esc_attr( $class ) . '" src="' . esc_url( $url ) . '" alt="" aria-hidden="true" />';
+}
+
+/**
+ * Front-end map for a location.
+ *
+ * - Uses the location's own map, or inherits the nearest parent's map. A deleted map file is
+ *   skipped, so the parent's map is used.
+ * - SVG maps are output inline and sanitized, showing only the layers assigned to this
+ *   location (inherited from a parent if none are assigned). If no assigned layer exists
+ *   in the file (for example the SVG was replaced), the whole map is shown.
+ * - A location can instead lay a transparent PNG over its parent's map ("overlay"), and a
+ *   labels image is drawn on top of everything, so highlighted rooms sit under the labels.
+ * - Locations with "Show Map" turned off return nothing.
+ *
+ * @param array $args  'ignore_show_map' (bool) skip the Show Map toggle (admin preview)
+ */
+function conboard_get_location_map_html( int $location_id, array $args = [] ): string {
+
+	if ( empty( $args['ignore_show_map'] ) && ! conboard_location_shows_map( $location_id ) ) {
+		return '';
+	}
+
+	$stack = conboard_get_location_map_stack( $location_id );
+	if ( ! $stack || ! $stack['base'] ) return '';
+
+	$label = sprintf( 'Map of %s', get_the_title( $location_id ) );
+
+	$base_is_svg = get_post_mime_type( $stack['base'] ) === 'image/svg+xml';
+	$selected    = $base_is_svg ? conboard_get_inherited_map_layers( $location_id ) : null;
+
+	$base = conboard_get_map_base_markup( $stack['base'], $label, $selected );
+	if ( $base === '' ) return '';
+
+	$layers = '';
+	if ( $stack['highlight'] ) $layers .= conboard_get_map_overlay_img( $stack['highlight'], 'conboard-map-highlight' );
+	if ( $stack['labels'] )    $layers .= conboard_get_map_overlay_img( $stack['labels'], 'conboard-map-labels' );
+
+	if ( $layers === '' ) {
+		return '<div class="conboard-location-map">' . $base . '</div>';
+	}
+
+	return '<div class="conboard-location-map conboard-map-stack">' . $base . $layers . '</div>';
 }
