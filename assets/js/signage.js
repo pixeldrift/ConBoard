@@ -293,11 +293,74 @@
 					readServerTime();
 				}
 
+				syncOk();
 				startPages();
 				tickSchedule();
 			} )
 			.catch( function () { /* offline: keep showing the last good content */ } );
 	}
+
+
+	// ---------------------------------------------------------------------
+	// Sync indicator (dead man's switch): the screen asks the site "still there?" every 30 seconds.
+	// If no answer (or a content refresh) has succeeded for 75 seconds, a crossed-out Wi-Fi symbol
+	// appears, so a screen showing old content is obvious at a glance. ?sync=offline (default),
+	// always (also a small green dot while current) or off.
+	// ---------------------------------------------------------------------
+
+	var syncEl = byId( 'cb-sync' );
+	var syncMode = 'offline';
+	var lastSyncOk = Date.now();
+	var SYNC_EVERY = 30000;
+	var SYNC_STALE = 75000;
+
+	try {
+		var wanted = new URL( window.location.href ).searchParams.get( 'sync' );
+		if ( wanted === 'always' || wanted === 'off' || wanted === 'offline' ) {
+			syncMode = wanted;
+		}
+	} catch ( e ) { /* keep the default */ }
+
+	function renderSync() {
+		if ( ! syncEl ) {
+			return;
+		}
+
+		var stale = Date.now() - lastSyncOk > SYNC_STALE || window.navigator.onLine === false;
+
+		syncEl.setAttribute( 'data-state', stale ? 'offline' : 'live' );
+		syncEl.hidden = syncMode === 'off' || ( syncMode === 'offline' && ! stale );
+		syncEl.setAttribute( 'title', stale ? 'Offline: showing the last content received' : 'Live' );
+	}
+
+	function syncOk( serverMs ) {
+		lastSyncOk = Date.now();
+
+		if ( serverMs ) {
+			skew = serverMs - Date.now();
+		}
+
+		renderSync();
+	}
+
+	function ping() {
+		if ( ! window.fetch || ! cfg.ping ) {
+			return;
+		}
+
+		window.fetch( cfg.ping, { cache: 'no-store', credentials: 'same-origin' } )
+			.then( function ( response ) {
+				return response.ok ? response.json() : Promise.reject( new Error( 'bad response' ) );
+			} )
+			.then( function ( data ) { syncOk( data && data.now ); } )
+			.catch( function () { renderSync(); } );
+	}
+
+	window.setInterval( ping, SYNC_EVERY );
+	window.setInterval( renderSync, 5000 );
+	window.addEventListener( 'online', ping );
+	window.addEventListener( 'offline', renderSync );
+	renderSync();
 
 	// ---------------------------------------------------------------------
 	// QR code
@@ -576,6 +639,13 @@
 				exportJpg( false );
 				return;
 
+			case 'sync':
+				syncMode = syncMode === 'offline' ? 'always' : ( syncMode === 'always' ? 'off' : 'offline' );
+				setParam( 'sync', syncMode );
+				toast( 'Sync indicator: ' + ( { offline: 'only when offline', always: 'always (green dot when current)', off: 'off' } )[ syncMode ] + '.' );
+				renderSync();
+				break;
+
 			case 'export-zip':
 				exportJpg( true, 'zip' );
 				break;
@@ -587,7 +657,7 @@
 			case 'reset':
 				try {
 					var url = new URL( window.location.href );
-					[ 'orientation', 'rotate', 'flip', 'interval', 'refresh', 'clock', 'qr', 'export' ].forEach( function ( key ) {
+					[ 'orientation', 'rotate', 'flip', 'interval', 'refresh', 'clock', 'qr', 'sync', 'export' ].forEach( function ( key ) {
 						url.searchParams.delete( key );
 					} );
 					window.location.href = url.toString();

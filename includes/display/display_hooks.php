@@ -48,3 +48,19 @@ function conboard_register_screen_assets(): void {
 		true
 	);
 }
+
+
+/**
+ * Sync check for screens: a tiny public endpoint a screen calls every so often. If the answers stop
+ * arriving, the screen shows its offline indicator. Also returns the server time in milliseconds.
+ */
+add_action( 'rest_api_init', function () {
+	register_rest_route( 'conboard/v1', '/ping', [
+		'methods'             => 'GET',
+		'permission_callback' => '__return_true',
+		'callback'            => function () {
+			nocache_headers();
+			return rest_ensure_response( [ 'ok' => true, 'now' => (int) ( microtime( true ) * 1000 ) ] );
+		},
+	] );
+} );

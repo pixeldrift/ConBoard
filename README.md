@@ -68,6 +68,7 @@ The screen options you can put in the URL:
 - `interval=10`: seconds each page stays up when a screen loops through several pages
 - `refresh=60`: seconds between live data updates
 - `clock=yes|no` and `qr=yes|no`: show or hide the clock and the QR code
+- `sync=offline|always|off`: the sync indicator. By default a small crossed-out Wi-Fi symbol appears in the top corner if the screen has lost its live connection and is showing old content. `always` also shows a small green dot while the screen is current, and `off` hides it.
 
 Move the mouse or touch the screen to reveal the gear in the corner. It opens a small menu to go fullscreen, rotate, flip, and show or hide the clock and QR code. Changes made there only live in the address bar, so the screen is easy to fix on the spot and nothing is saved.
 

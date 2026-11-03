@@ -352,3 +352,13 @@ body.is-awake #cb-menu { opacity: 1; }
 	position: absolute; inset: 0; width: 100%; height: 100%;
 	max-width: none; object-fit: contain; pointer-events: none;
 }
+
+/* Sync indicator: crossed-out Wi-Fi when the screen has lost its live connection, optional green dot when current */
+#cb-sync { position: absolute; top: 14px; left: 18px; z-index: 40; display: flex; align-items: center; gap: 8px; pointer-events: none; opacity: 0.9; font-size: 22px; }
+#cb-sync[hidden] { display: none; }
+#cb-sync .cb-sync-offline { width: 34px; height: 34px; color: #ef4444; display: none; }
+#cb-sync .cb-sync-live { width: 14px; height: 14px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.7); display: none; }
+#cb-sync[data-state="offline"] .cb-sync-offline { display: block; }
+#cb-sync[data-state="live"] .cb-sync-live { display: block; }
+#cb-sync .cb-sync-text { color: #ef4444; }
+.is-exporting #cb-sync { display: none; }
