@@ -25,8 +25,8 @@ Still to do:
 - Screen versions that use the Display Board slide timing.
 
 ## Phase 2: Time-aware core
-- Event days in global settings (Day 1 - Sunday - Jan 24 formats).
-- Now / Next logic; in-progress and starting-soon highlighting; schedule views.
+- Event days in global settings (Day 1 - Sunday - Jan 24 formats). Not done.
+- DONE on dev: Now / Next, in-progress and starting-soon highlighting, schedule views (see docs/DISPLAY_BOARDS.md section 6).
 - Presenter repeater and column on Sessions (ACF free limits apply).
 
 ## Phase 3: Display Boards

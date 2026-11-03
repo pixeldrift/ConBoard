@@ -23,7 +23,8 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * @param string $key  Short unique key, e.g. 'welcome'
  * @param array  $def  [
  *     'label'  => 'Welcome',
- *     'fields' => [ 'heading' => [ 'label' => 'Heading', 'type' => 'text' ], ... ]  (row editor field definitions),
+ *     'fields' => [ 'heading' => [ 'label' => 'Heading', 'type' => 'text' ], ... ]  (row editor field definitions;
+ *                  or a function returning them, for fields that need WordPress data such as the list of locations),
  *     'render' => callable( array $settings, array $slide, int $board_id ): string   HTML, or '' to skip the slide
  * ]
  */
@@ -36,6 +37,12 @@ function conboard_register_slide_type( string $key, array $def ): void {
 
 function conboard_get_slide_types(): array {
 	return apply_filters( 'conboard_slide_types', [] );
+}
+
+// A slide type's settings fields (resolved at the moment they are needed)
+function conboard_get_slide_type_fields( array $def ): array {
+	$fields = $def['fields'] ?? [];
+	return is_callable( $fields ) ? (array) $fields() : (array) $fields;
 }
 
 
@@ -142,7 +149,7 @@ function conboard_get_slide_editor_fields(): array {
 	];
 
 	foreach ( $types as $key => $def ) {
-		foreach ( ( $def['fields'] ?? [] ) as $name => $field ) {
+		foreach ( conboard_get_slide_type_fields( $def ) as $name => $field ) {
 			$field['show_when'] = [ 'field' => 'type', 'in' => [ $key ] ];
 			$field['required']  = false;
 			$fields[ $key . '__' . $name ] = $field;
@@ -189,7 +196,7 @@ function conboard_rows_to_slides( array $rows ): array {
 
 		$settings = [];
 
-		foreach ( array_keys( $types[ $type ]['fields'] ?? [] ) as $name ) {
+		foreach ( array_keys( conboard_get_slide_type_fields( $types[ $type ] ) ) as $name ) {
 			$settings[ $name ] = (string) ( $row[ $type . '__' . $name ] ?? '' );
 		}
 

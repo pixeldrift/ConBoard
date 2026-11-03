@@ -37,6 +37,7 @@ require_once CONBOARD_PLUGIN_PATH . 'includes/helpers.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/presenter_roles.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/sponsor_levels.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/links.php';
+require_once CONBOARD_PLUGIN_PATH . 'includes/schedule.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/activation.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/defaults.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/shortcodes.php';
@@ -73,6 +74,7 @@ require_once CONBOARD_PLUGIN_PATH . 'includes/display/display_params.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/display/display_qr_code.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/display/display_screens.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/display/display_slides.php';
+require_once CONBOARD_PLUGIN_PATH . 'includes/display/display_slides_schedule.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/display/display_routing.php';
 
 // Admin - Order matters

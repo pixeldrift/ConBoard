@@ -39,6 +39,15 @@ acf_add_local_field_group([
 			'return_format'	=> 'Y-m-d H:i:s',
 		],
 
+		[
+			'key'			=> 'field_conboard_session_cancelled',
+			'label'			=> 'Cancelled',
+			'name'			=> 'cancelled',
+			'type'			=> 'true_false',
+			'ui'			=> 1,
+			'instructions'	=> 'Keep the session listed on schedules and screens, marked as cancelled.',
+		],
+
 	],
 	'location' => [
 		[

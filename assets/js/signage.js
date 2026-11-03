@@ -120,6 +120,87 @@
 	}
 
 	// ---------------------------------------------------------------------
+	// Live schedule: session state, progress and countdowns
+	//
+	// Every session card carries its start and end as timestamps, so its state
+	// (upcoming, starting soon, in progress, finished) is worked out here, once a second,
+	// using the server's time. It does not wait for the next refresh. When a state changes,
+	// the content is refreshed straight away (at most every 10 seconds) so lists that depend
+	// on it, such as "Next", pick up the change.
+	// ---------------------------------------------------------------------
+
+	var SOON_SECONDS = 900;
+	var lastRefreshAt = 0;
+
+	function describeDuration( seconds ) {
+		var minutes = Math.ceil( seconds / 60 );
+
+		if ( seconds < 60 ) {
+			return 'less than a minute';
+		}
+
+		if ( minutes < 60 ) {
+			return minutes + ' min';
+		}
+
+		var hours = Math.floor( minutes / 60 );
+		var rest = minutes % 60;
+
+		return hours + ' h' + ( rest ? ' ' + rest + ' min' : '' );
+	}
+
+	function tickSchedule() {
+		var now = ( Date.now() + skew ) / 1000;
+		var changed = false;
+
+		content.querySelectorAll( '.cb-session[data-start]' ).forEach( function ( el ) {
+			var current = el.getAttribute( 'data-state' );
+
+			if ( current === 'cancelled' ) {
+				return;
+			}
+
+			var start = parseInt( el.getAttribute( 'data-start' ), 10 );
+			var end = parseInt( el.getAttribute( 'data-end' ), 10 );
+			var next = now >= end ? 'past' : ( now >= start ? 'current' : ( start - now <= SOON_SECONDS ? 'soon' : 'upcoming' ) );
+
+			if ( next !== current ) {
+				el.classList.remove( 'cb-session-' + current );
+				el.classList.add( 'cb-session-' + next );
+				el.setAttribute( 'data-state', next );
+				changed = true;
+			}
+
+			var label = el.querySelector( '.cb-countdown' );
+			var bar = el.querySelector( '.cb-progress span' );
+			var text = '';
+			var percent = 0;
+
+			if ( next === 'current' ) {
+				text = 'Ends in ' + describeDuration( end - now );
+				percent = end > start ? Math.min( 100, Math.max( 0, ( now - start ) / ( end - start ) * 100 ) ) : 100;
+			} else if ( next === 'past' ) {
+				text = 'Finished';
+				percent = 100;
+			} else {
+				text = 'Starts in ' + describeDuration( start - now );
+			}
+
+			if ( label && label.textContent !== text ) {
+				label.textContent = text;
+			}
+
+			if ( bar ) {
+				bar.style.width = percent.toFixed( 1 ) + '%';
+			}
+		} );
+
+		if ( changed && Date.now() - lastRefreshAt > 10000 ) {
+			refresh();
+		}
+	}
+
+	// ---------------------------------------------------------------------
 	// Pages: loop through them when there is more than one
 	// ---------------------------------------------------------------------
 
@@ -178,6 +259,8 @@
 			return;
 		}
 
+		lastRefreshAt = Date.now();
+
 		window.fetch( window.location.href, { cache: 'no-store', credentials: 'same-origin' } )
 			.then( function ( response ) {
 				return response.ok ? response.text() : Promise.reject( new Error( 'bad response' ) );
@@ -208,6 +291,7 @@
 				}
 
 				startPages();
+				tickSchedule();
 			} )
 			.catch( function () { /* offline: keep showing the last good content */ } );
 	}
@@ -355,9 +439,11 @@
 	readServerTime();
 	layout();
 	tick();
+	tickSchedule();
 	drawQr();
 	startPages();
 
 	window.setInterval( tick, 1000 );
+	window.setInterval( tickSchedule, 1000 );
 	window.setInterval( refresh, state.refresh * 1000 );
 } )();

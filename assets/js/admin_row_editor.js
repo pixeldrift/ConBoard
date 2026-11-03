@@ -80,6 +80,10 @@
 				for ( var i = 0; i < from.length; i++ ) {
 					if ( from[ i ].type === 'checkbox' ) {
 						to[ i ].checked = from[ i ].checked;
+					} else if ( from[ i ].multiple ) {
+						for ( var o = 0; o < from[ i ].options.length; o++ ) {
+							to[ i ].options[ o ].selected = from[ i ].options[ o ].selected;
+						}
 					} else {
 						to[ i ].value = from[ i ].value;
 					}

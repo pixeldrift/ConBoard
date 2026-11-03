@@ -76,24 +76,9 @@ function conboard_screen_presenter_names( int $session_id ): string {
 	return implode( ', ', array_unique( $names ) );
 }
 
-// A session as a large card
-function conboard_screen_session_card( WP_Post $session, int $page_location_id = 0, string $state = '' ): string {
-
-	$start      = get_post_meta( $session->ID, 'start_time', true );
-	$end        = get_post_meta( $session->ID, 'end_time', true );
-	$location   = (int) get_post_meta( $session->ID, 'location', true );
-	$presenters = conboard_screen_presenter_names( $session->ID );
-	$time       = conboard_screen_time_range( $start, $end );
-
-	$html  = '<article class="cb-session' . ( $state ? ' cb-session-' . esc_attr( $state ) : '' ) . '">';
-	$html .= $time ? '<div class="cb-session-time">' . esc_html( $time ) . '</div>' : '';
-	$html .= '<h3 class="cb-session-title">' . esc_html( get_the_title( $session ) ) . '</h3>';
-	$html .= $presenters ? '<div class="cb-session-presenters">' . esc_html( $presenters ) . '</div>' : '';
-	$html .= ( $location && $location !== $page_location_id )
-		? '<div class="cb-session-room">' . esc_html( get_the_title( $location ) ) . '</div>'
-		: '';
-
-	return $html . '</article>';
+// A session as a large card that keeps its own state and countdown up to date (see includes/schedule.php)
+function conboard_screen_session_card( WP_Post $session, int $page_location_id = 0 ): string {
+	return conboard_schedule_item_html( conboard_schedule_row( $session ), [ 'hide_location' => $page_location_id ] );
 }
 
 // A photo or logo tile with a name (not clickable: screens have no one to click)
@@ -145,41 +130,29 @@ function conboard_screen_title(): string {
 // A location: what is happening now, what is next, and the map
 function conboard_screen_location( WP_Post $location ): string {
 
-	$now      = current_time( 'timestamp' );
-	$sessions = conboard_get_sessions_for_location( $location->ID );
-	$current  = [];
-	$upcoming = [];
-
-	foreach ( $sessions as $session ) {
-		$state = conboard_get_session_state( $session->ID, $now );
-
-		if ( $state === 'current' ) {
-			$current[] = $session;
-		} elseif ( $state === 'upcoming' ) {
-			$upcoming[] = $session;
-		}
-	}
+	// Sessions still to come (or in progress) here, nested rooms included
+	$rows     = conboard_schedule_query([ 'date' => 'all', 'locations' => [ $location->ID ], 'completed' => 'hide', 'cancelled' => 'hide' ]);
+	$current  = array_values( array_filter( $rows, fn( $r ) => $r['state'] === 'current' ) );
+	$upcoming = array_values( array_filter( $rows, fn( $r ) => in_array( $r['state'], [ 'soon', 'upcoming' ], true ) ) );
+	$options  = [ 'hide_location' => $location->ID ];
 
 	$main = '';
 
 	if ( $current ) {
 		$main .= '<section class="cb-block cb-now"><h2 class="cb-label">Happening now</h2>';
-		foreach ( array_slice( $current, 0, 3 ) as $session ) {
-			$main .= conboard_screen_session_card( $session, $location->ID, 'current' );
-		}
+		$main .= conboard_schedule_list_html( array_map( fn( $r ) => conboard_schedule_item_html( $r, $options ), array_slice( $current, 0, 3 ) ), 'hide' );
 		$main .= '</section>';
 	}
 
 	if ( $upcoming ) {
 		$main .= '<section class="cb-block cb-next"><h2 class="cb-label">' . ( $current ? 'Next' : 'Up next' ) . '</h2>';
-		foreach ( array_slice( $upcoming, 0, $current ? 2 : 3 ) as $session ) {
-			$main .= conboard_screen_session_card( $session, $location->ID, 'upcoming' );
-		}
+		$main .= conboard_schedule_list_html( array_map( fn( $r ) => conboard_schedule_item_html( $r, $options ), array_slice( $upcoming, 0, $current ? 2 : 3 ) ), 'hide' );
 		$main .= '</section>';
 	}
 
 	if ( ! $main ) {
-		$main = conboard_screen_empty( $sessions ? 'No more sessions here' : 'Nothing scheduled here' );
+		$any  = conboard_schedule_query([ 'date' => 'all', 'locations' => [ $location->ID ] ]);
+		$main = conboard_screen_empty( $any ? 'No more sessions here' : 'Nothing scheduled here' );
 	}
 
 	$map  = conboard_get_location_map_html( $location->ID );
@@ -301,21 +274,10 @@ function conboard_screen_announcement( WP_Post $announcement ): string {
 // Schedule: what is on now and next, a few sessions per page
 function conboard_screen_sessions_archive(): string {
 
-	$now   = current_time( 'timestamp' );
 	$cards = [];
 
-	$sessions = get_posts([
-		'post_type'			=> 'session',
-		'post_status'		=> 'publish',
-		'posts_per_page'	=> -1,
-	]);
-
-	foreach ( conboard_sort_sessions_by_start( $sessions ) as $session ) {
-		$state = conboard_get_session_state( $session->ID, $now );
-
-		if ( in_array( $state, [ 'current', 'upcoming' ], true ) ) {
-			$cards[] = conboard_screen_session_card( $session, 0, $state );
-		}
+	foreach ( conboard_schedule_query([ 'date' => 'all', 'completed' => 'hide', 'cancelled' => 'hide' ]) as $row ) {
+		$cards[] = conboard_schedule_item_html( $row );
 	}
 
 	if ( empty( $cards ) ) {
@@ -325,7 +287,7 @@ function conboard_screen_sessions_archive(): string {
 	$pages = [];
 
 	foreach ( array_chunk( $cards, 4 ) as $chunk ) {
-		$pages[] = '<div class="cb-session-list">' . implode( '', $chunk ) . '</div>';
+		$pages[] = conboard_schedule_list_html( $chunk, 'hide', 'cb-session-list' );
 	}
 
 	return conboard_screen_pages( $pages );

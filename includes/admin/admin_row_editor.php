@@ -45,7 +45,10 @@ function conboard_sanitize_rows( $raw, array $fields ): array {
 			$value = $row[ $key ] ?? '';
 			$type  = $field['type'] ?? 'text';
 
-			if ( is_array( $value ) ) {
+			if ( is_array( $value ) && $type === 'multiselect' ) {
+				$allowed = array_map( 'strval', array_keys( $field['choices'] ?? [] ) );
+				$value   = implode( ',', array_values( array_intersect( array_map( 'strval', $value ), $allowed ) ) );
+			} elseif ( is_array( $value ) ) {
 				$value = '';
 			}
 
@@ -56,6 +59,8 @@ function conboard_sanitize_rows( $raw, array $fields ): array {
 				$value   = in_array( $value, $choices, true ) ? $value : ( ! empty( $field['strict'] ) ? '' : (string) ( $field['default'] ?? '' ) );
 			} elseif ( $type === 'url' ) {
 				$value = esc_url_raw( trim( $value ) );
+			} elseif ( $type === 'multiselect' ) {
+				// already cleaned above
 			} elseif ( $type === 'textarea' ) {
 				$value = sanitize_textarea_field( $value );
 			} elseif ( $type === 'checkbox' ) {
@@ -102,6 +107,17 @@ function conboard_get_row_editor_field_html( string $name, $index, string $key, 
 		}
 
 		return $html . '</select>';
+	}
+
+	if ( $type === 'multiselect' ) {
+		$chosen = $value === '' ? [] : explode( ',', $value );
+		$html   = '<select multiple size="' . (int) ( $field['size'] ?? 4 ) . '" name="' . $input . '[]">';
+
+		foreach ( ( $field['choices'] ?? [] ) as $choice => $label ) {
+			$html .= '<option value="' . esc_attr( (string) $choice ) . '"' . ( in_array( (string) $choice, $chosen, true ) ? ' selected' : '' ) . '>' . esc_html( (string) $label ) . '</option>';
+		}
+
+		return $html . '</select><span class="description">Leave empty for all. Hold Ctrl/Cmd to pick several.</span>';
 	}
 
 	if ( $type === 'textarea' ) {

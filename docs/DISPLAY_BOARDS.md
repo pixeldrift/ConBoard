@@ -53,3 +53,12 @@ Reusable as is: scaling and orientation shell, URL overrides, refresh, QR, scree
 - A board's plain link redirects to screen mode (other options in the address are kept). URL overrides still beat board settings.
 - `signage.js` uses per-slide `data-duration`; transition is `fade` or `none`.
 - A starter "Main Display" board is created on activation if there are no boards.
+
+## 6. Phase 2 as built (live schedules)
+
+- `includes/schedule.php`: `conboard_schedule_query()` finds sessions (date: today / a date / all; locations including nested rooms; tracks = Session Types; "starting within" window; finished: show/dim/hide; cancelled; limit) and works out each one's state: upcoming, soon (15 min), current, past. Times are real timestamps, converted from the site's local time. Missing end times assume 60 minutes (`conboard_default_session_minutes` filter). Overlaps, cancelled sessions, missing locations and multi-day events are handled. `conboard_now` filter lets previews and tests pretend it is another time.
+- Session cards (`conboard_schedule_item_html()`) carry `data-start`/`data-end`. `signage.js` recalculates state, progress bar and countdown every second from server time, and refreshes the content right away when something changes state (at most every 10 seconds). Slide duration and data refresh stay independent.
+- New slide types: Now / Next, Daily Schedule, Room Schedule, Coming Up, Schedule Grid (rooms across, 15-minute rows).
+- Sessions have a Cancelled switch; cancelled sessions show struck through with a badge.
+- The Location, Schedule and Presenter screens now use the same cards, so they are live too.
+- Not yet: pinning the current session to the top, grouping by track, side-by-side handling of overlapping sessions in one grid column, simulated time in the editor preview (the `conboard_now` filter is the hook for it).
