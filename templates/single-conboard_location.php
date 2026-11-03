@@ -5,7 +5,7 @@
  * Single Location (campus, building, floor or room)
  */
 
-get_header();
+conboard_template_header();
 
 the_post();
 
@@ -199,4 +199,4 @@ $headings = [
 
 </main>
 
-<?php get_footer(); ?>
+<?php conboard_template_footer(); ?>

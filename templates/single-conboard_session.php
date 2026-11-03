@@ -1,7 +1,7 @@
 <?php
 // templates/single-conboard_session.php
 
-get_header();
+conboard_template_header();
 
 the_post();
 
@@ -83,4 +83,4 @@ $presenters  = conboard_get_session_presenters($session_id);
 
 </main>
 
-<?php get_footer(); ?>
+<?php conboard_template_footer(); ?>

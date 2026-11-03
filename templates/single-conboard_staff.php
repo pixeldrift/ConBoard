@@ -5,7 +5,7 @@
  * Single Staff Member
  */
 
-get_header();
+conboard_template_header();
 
 the_post();
 
@@ -66,4 +66,4 @@ $links_html = conboard_render_post_links($staff_id, 'staff-links');
 
 </main>
 
-<?php get_footer(); ?>
+<?php conboard_template_footer(); ?>

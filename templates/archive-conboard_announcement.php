@@ -5,7 +5,7 @@
  * Archive: Announcements. Current ones first (urgent on top), then expired ones.
  */
 
-get_header();
+conboard_template_header();
 
 $current_html = conboard_render_announcements([ 'status' => 'active' ]);
 $expired_html = conboard_render_announcements([ 'status' => 'expired' ]);
@@ -33,4 +33,4 @@ $expired_html = conboard_render_announcements([ 'status' => 'expired' ]);
 
 </main>
 
-<?php get_footer(); ?>
+<?php conboard_template_footer(); ?>

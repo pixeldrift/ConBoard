@@ -5,7 +5,7 @@
  * Archive: Staff (by Display Order)
  */
 
-get_header();
+conboard_template_header();
 
 $staff_html = conboard_render_staff([
 	'layout'	=> 'grid',
@@ -26,4 +26,4 @@ $staff_html = conboard_render_staff([
 
 </main>
 
-<?php get_footer(); ?>
+<?php conboard_template_footer(); ?>

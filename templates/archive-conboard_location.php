@@ -5,7 +5,7 @@
  * Archive: Locations, nested (campus > building > floor > room)
  */
 
-get_header();
+conboard_template_header();
 
 $tree_html = conboard_render_location_tree();
 
@@ -23,4 +23,4 @@ $tree_html = conboard_render_location_tree();
 
 </main>
 
-<?php get_footer(); ?>
+<?php conboard_template_footer(); ?>

@@ -5,7 +5,7 @@
  * Single Announcement
  */
 
-get_header();
+conboard_template_header();
 
 the_post();
 
@@ -45,4 +45,4 @@ $expired         = conboard_announcement_is_expired($announcement_id);
 
 </main>
 
-<?php get_footer(); ?>
+<?php conboard_template_footer(); ?>

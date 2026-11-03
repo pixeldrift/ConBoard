@@ -5,7 +5,7 @@
  * Single Sponsor
  */
 
-get_header();
+conboard_template_header();
 
 the_post();
 
@@ -57,4 +57,4 @@ $links_html = conboard_render_post_links($sponsor_id, 'sponsor-socials');
 
 </main>
 
-<?php get_footer(); ?>
+<?php conboard_template_footer(); ?>
