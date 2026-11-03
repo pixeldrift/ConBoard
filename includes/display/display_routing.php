@@ -15,7 +15,7 @@ add_filter( 'template_include', function ( $template ) {
 
 	$types = conboard_screen_post_types();
 
-	if ( is_singular( $types ) || is_post_type_archive( $types ) ) {
+	if ( is_singular( $types ) || is_singular( 'venue_screen' ) || is_post_type_archive( $types ) ) {
 		return CONBOARD_PLUGIN_PATH . 'templates/display/screen.php';
 	}
 

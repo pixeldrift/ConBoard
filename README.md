@@ -151,6 +151,14 @@ A starter "Main Display" board is created for you when the plugin is activated.
 
 As a convenience for AV teams, Display Board properties may be temporarily overridden via URL parameters without requiring a backend login. For example, if you show up to the venue and discover one of the screens is rotated the opposite direction from the others, there is no need to have admin access or create a new Display Board just for that one screen when the content should stay the same. Just change the rotation flag in the URL. URL overrides take precedence over Display Board settings for that one screen only and do not persist.
 
+## Screens
+
+The **Screens** list is a register of the physical displays at your venue, handy for planning from an on-site audit. Each screen has a name, a location, a resolution, a player type for reference (built-in TV browser, Roku, Chromecast, Fire TV Stick, USB stick, laptop, Raspberry Pi, and so on), and notes. You can attach an optional reference photo. It can also have its own orientation, rotation, flip, clock, and QR code settings, which apply to that screen only.
+
+Every screen has its own permanent address, such as `https://example.com/screen/lobby-tv/`. Open it on the device once. It always shows whatever Display Board is assigned to that screen, so after the initial setup you never have to touch the device again. Reassign the screen to a different board, or change its rotation or other settings, from the dashboard, and only that screen changes. The screen notices on its own within a minute or so. URL overrides still work for one-off fixes on site.
+
+Under **ConBoard > Screen Assignments** your screens appear as cards, each showing its photo, location, details, and the board it currently shows. Drag a Display Board from the side onto a screen card to assign it, or drag a screen card onto a board. Dropping a screen on **Unassigned** clears it. Each card also has a drop-down list, for touch screens.
+
 ## Shortcodes
 
 Drop ConBoard content into any page or post. All options are optional.
@@ -247,10 +255,8 @@ Everything in this README works today except the items below, which are describe
 - Pin the current session to the top of a schedule slide, group schedule slides by track, and place overlapping sessions side by side in the grid.
 
 #### Physical Screens
-- **Screen registry:** a list of the physical displays at your venue, built from an on-site audit. Each screen gets a name, location, resolution, rotation, and a type of display unit for reference (built-in TV browser, Roku, Chromecast, Fire TV Stick, USB stick, laptop, Raspberry Pi, and so on). An optional photo can be attached as a reference.
-- **Screen cards:** a grid of all your venue screens showing which Display Board, if any, is currently assigned to each one. Drag a screen card and drop it onto a board (or a board onto a screen) to assign it.
-- **One permanent address per screen:** each registered screen gets its own URL that acts like a proxy and shows whatever is currently assigned to it. After a one-time setup of the device, you can reassign it to a different board or change its settings (rotation, clock, QR code, and so on) from the central dashboard at any time, without touching the device and without affecting any other screen. This also makes the registry more than a planning tool.
-- Overrides in the URL still win for one-off fixes on site, as they do for Display Boards.
+- **Screen status:** show when each registered screen last checked in, so a dead or unplugged screen stands out on the Screen Assignments page.
+- **Screen groups:** assign one board to every screen in a location or group at once.
 
 #### Scheduling
 - **Conflicts:** a visual report page, suggestions for alternate rooms, conflict warnings on Display Boards, and an option to prevent conflicts when saving.

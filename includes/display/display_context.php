@@ -11,6 +11,11 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 function conboard_is_display(): bool {
+	// A registered screen's own address is always a screen
+	if ( did_action( 'wp' ) && is_singular( 'venue_screen' ) ) {
+		return true;
+	}
+
 	return isset( $_GET['display'] ) && conboard_normalize_display_param( 'display', $_GET['display'] ) === 'screen';
 }
 
@@ -78,7 +83,7 @@ function conboard_context_from_url(): array {
 function conboard_get_screen_standard_url(): string {
 
 	// A Display Board has no ordinary version; its QR code points to the home page
-	if ( is_singular( 'display_board' ) ) {
+	if ( is_singular( [ 'display_board', 'venue_screen' ] ) ) {
 		return home_url( '/' );
 	}
 
@@ -132,6 +137,11 @@ function conboard_get_display_context(): array {
 		if ( is_singular( 'display_board' ) ) {
 			$context['source'] = 'board';
 			$context = array_merge( $context, conboard_context_from_display_board( $context['post_id'] ) );
+		}
+
+		if ( is_singular( 'venue_screen' ) ) {
+			$context['source'] = 'device';
+			$context = array_merge( $context, conboard_context_from_screen( $context['post_id'] ) );
 		}
 	}
 

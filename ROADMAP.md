@@ -3,6 +3,7 @@
 Updated Nov 3, 2026. Phases 0-3 are built (on `main`); the sections below list what is left.
 
 ## Done
+- Screen registry: Screens (name, location, resolution, rotation, player type, notes, reference photo), a permanent address per screen that shows its assigned board and updates itself when reassigned, and the Screen Assignments page with drag and drop in both directions.
 - Repo loads cleanly; Locations rename finished; templates and shortcodes for every post type.
 - Screen Mode (`?display=screen`) for every page and list, with URL overrides, live refresh, clock and local QR codes.
 - Time-aware core: Now/Next, starting-soon and in-progress states, schedule views, Event Days in Settings.
@@ -18,7 +19,7 @@ Updated Nov 3, 2026. Phases 0-3 are built (on `main`); the sections below list w
 - Program Planner (ConBoard > Program Planner): unscheduled cards, day grid with rooms as columns, drag to schedule, move, resize, unschedule (length kept), day arrows with prev/next strips; map pane (layers as drop zones, room list for maps without layers, room boxes with no map) with a red time line that follows the grid scroll, room highlights and title/time pills.
 
 ## Next
-- Screen registry: audit list of physical displays (name, location, resolution, rotation, unit type, photo), screen cards with drag-and-drop board assignment, and a permanent per-screen address that shows whatever board is assigned.
+- Screen status: last check-in per screen on the Screen Assignments page, and assigning a board to a group of screens at once.
 - Conflicts: visual report page, alternate room suggestions, Display Board awareness, prevent at save (optional).
 - Display Boards Phase 4: layouts, ticker, interruptions, scheduled slides, board editor live preview.
 - Split first/last name for Presenters and Staff (decision pending).

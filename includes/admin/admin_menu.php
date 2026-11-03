@@ -11,6 +11,7 @@ define('CONBOARD_CPTS', [
 	'sponsor',
 	'staff',
 	'display_board',
+	'venue_screen',
 	'announcement',
 ]);
 
@@ -108,6 +109,7 @@ add_filter('menu_order', function ( $menu_order ) {
 			CONBOARD_CPTS
 		),
 		[
+			'conboard_screens',
 			'conboard_settings',
 			'conboard_about',
 		]

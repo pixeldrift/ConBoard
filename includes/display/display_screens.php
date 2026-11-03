@@ -112,6 +112,11 @@ function conboard_screen_tile_pages( array $tiles, int $per_page = 8, string $he
 
 function conboard_screen_title(): string {
 
+	if ( is_singular( 'venue_screen' ) ) {
+		$board_id = conboard_get_screen_board_id( get_queried_object_id() );
+		return get_the_title( $board_id ?: get_queried_object_id() );
+	}
+
 	if ( is_singular() ) {
 		return get_the_title( get_queried_object_id() );
 	}
@@ -410,6 +415,7 @@ function conboard_screen_render_content(): string {
 			case 'staff':        return conboard_screen_staff( $post );
 			case 'announcement': return conboard_screen_announcement( $post );
 			case 'display_board': return conboard_screen_board( $post );
+			case 'venue_screen':  return conboard_screen_device_page( $post );
 		}
 
 		return '';
