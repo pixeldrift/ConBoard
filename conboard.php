@@ -75,6 +75,7 @@ require_once CONBOARD_PLUGIN_PATH . 'includes/display/display_qr_code.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/display/display_screens.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/display/display_slides.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/display/display_slides_schedule.php';
+require_once CONBOARD_PLUGIN_PATH . 'includes/display/display_slides_content.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/display/display_routing.php';
 
 // Admin - Order matters

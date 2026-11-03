@@ -212,6 +212,7 @@
 		}
 
 		pageIndex = index;
+		pageQr();
 	}
 
 	// Each page can set its own length with data-duration (seconds); otherwise the
@@ -231,6 +232,7 @@
 		}
 
 		if ( pages.length < 2 ) {
+			pageQr();
 			return;
 		}
 
@@ -300,12 +302,17 @@
 	// QR code
 	// ---------------------------------------------------------------------
 
-	function drawQr() {
-		var holder = byId( 'cb-qr' );
-		var target = byId( 'cb-qr-code' );
-		var url = holder ? holder.getAttribute( 'data-url' ) : '';
+	var qrHolder = byId( 'cb-qr' );
+	var defaultQrUrl = qrHolder ? qrHolder.getAttribute( 'data-url' ) || '' : '';
+	var shownQrUrl = null;
 
-		if ( ! target || ! url || typeof window.qrcode !== 'function' ) {
+	// Draw the QR code for an address (the screen's own address when none is given)
+	function drawQr( url ) {
+		var target = byId( 'cb-qr-code' );
+
+		url = url || defaultQrUrl;
+
+		if ( ! target || ! url || typeof window.qrcode !== 'function' || url === shownQrUrl ) {
 			return;
 		}
 
@@ -314,12 +321,26 @@
 			qr.addData( url );
 			qr.make();
 			target.innerHTML = qr.createSvgTag( { cellSize: 4, margin: 16, scalable: true } );
+			shownQrUrl = url;
+
+			if ( qrHolder ) {
+				qrHolder.hidden = false;
+			}
 		} catch ( e ) {
 			// Too long for a QR code or a library problem: hide it rather than show a broken one
-			if ( holder ) {
-				holder.hidden = true;
+			shownQrUrl = null;
+
+			if ( qrHolder ) {
+				qrHolder.hidden = true;
 			}
 		}
+	}
+
+	// A page (a slide) can have its own QR address in data-url, shown while it is on screen
+	function pageQr() {
+		var active = content.querySelector( '.cb-page.is-active' );
+
+		drawQr( active ? active.getAttribute( 'data-url' ) || '' : '' );
 	}
 
 	// ---------------------------------------------------------------------
@@ -440,7 +461,6 @@
 	layout();
 	tick();
 	tickSchedule();
-	drawQr();
 	startPages();
 
 	window.setInterval( tick, 1000 );

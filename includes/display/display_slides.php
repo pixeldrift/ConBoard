@@ -25,7 +25,10 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  *     'label'  => 'Welcome',
  *     'fields' => [ 'heading' => [ 'label' => 'Heading', 'type' => 'text' ], ... ]  (row editor field definitions;
  *                  or a function returning them, for fields that need WordPress data such as the list of locations),
- *     'render' => callable( array $settings, array $slide, int $board_id ): string   HTML, or '' to skip the slide
+ *     'render' => callable( array $settings, array $slide, int $board_id )
+ *                 Returns the slide's HTML, or '' to skip it. A slide that needs several screens (for example a
+ *                 page of sponsors per level) returns a list of pages; each page is HTML or
+ *                 [ 'html' => ..., 'url' => address for the QR code while this page shows ].
  * ]
  */
 function conboard_register_slide_type( string $key, array $def ): void {
@@ -243,8 +246,9 @@ conboard_register_slide_type( 'custom', [
 		'heading'	=> [ 'label' => 'Heading', 'type' => 'text' ],
 		'text'		=> [ 'label' => 'Text', 'type' => 'textarea', 'rows' => 4 ],
 		'image'		=> [ 'label' => 'Image', 'type' => 'image' ],
+		'qr_url'	=> [ 'label' => 'QR code address (optional)', 'type' => 'url' ],
 	],
-	'render'	=> function ( array $s ): string {
+	'render'	=> function ( array $s ) {
 
 		$image   = ! empty( $s['image'] ) ? wp_get_attachment_image( (int) $s['image'], 'large', false, [ 'class' => 'cb-slide-image' ] ) : '';
 		$heading = (string) ( $s['heading'] ?? '' );
@@ -260,7 +264,7 @@ conboard_register_slide_type( 'custom', [
 		$html .= $heading !== '' ? '<h2 class="cb-custom-heading">' . esc_html( $heading ) . '</h2>' : '';
 		$html .= $text !== '' ? '<div class="cb-custom-text">' . wpautop( esc_html( $text ) ) . '</div>' : '';
 
-		return $html . '</div></div>';
+		return [ 'html' => $html . '</div></div>', 'url' => (string) ( $s['qr_url'] ?? '' ) ];
 	},
 ]);
 
@@ -314,17 +318,27 @@ function conboard_screen_board( WP_Post $board ): string {
 			continue;
 		}
 
-		$html = (string) call_user_func( $types[ $slide['type'] ]['render'], $slide['settings'], $slide, $board->ID );
+		$result = call_user_func( $types[ $slide['type'] ]['render'], $slide['settings'], $slide, $board->ID );
 
-		if ( $html === '' ) {
-			continue;
+		// One page as a string or as [ 'html' => ... ], or a list of pages
+		if ( ! is_array( $result ) || isset( $result['html'] ) ) {
+			$result = [ $result ];
 		}
 
-		$pages[] = [
-			'html'		=> $html,
-			'duration'	=> $slide['duration'] > 0 ? $slide['duration'] : $default,
-			'type'		=> $slide['type'],
-		];
+		foreach ( $result as $page ) {
+			$page_html = is_array( $page ) ? (string) ( $page['html'] ?? '' ) : (string) $page;
+
+			if ( $page_html === '' ) {
+				continue;
+			}
+
+			$pages[] = [
+				'html'		=> $page_html,
+				'url'		=> is_array( $page ) ? (string) ( $page['url'] ?? '' ) : '',
+				'duration'	=> $slide['duration'] > 0 ? $slide['duration'] : $default,
+				'type'		=> $slide['type'],
+			];
+		}
 	}
 
 	if ( empty( $pages ) ) {
@@ -334,7 +348,7 @@ function conboard_screen_board( WP_Post $board ): string {
 	$html = '<div class="cb-pages cb-board" data-pages="' . count( $pages ) . '" data-transition="' . esc_attr( $settings['transition'] ) . '">';
 
 	foreach ( $pages as $index => $page ) {
-		$html .= '<section class="cb-page cb-slide-' . esc_attr( $page['type'] ) . ( $index === 0 ? ' is-active' : '' ) . '" data-duration="' . (int) $page['duration'] . '">' . $page['html'] . '</section>';
+		$html .= '<section class="cb-page cb-slide-' . esc_attr( $page['type'] ) . ( $index === 0 ? ' is-active' : '' ) . '" data-duration="' . (int) $page['duration'] . '"' . ( $page['url'] !== '' ? ' data-url="' . esc_attr( $page['url'] ) . '"' : '' ) . '>' . $page['html'] . '</section>';
 	}
 
 	return $html . '</div>';

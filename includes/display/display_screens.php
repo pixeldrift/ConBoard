@@ -293,11 +293,12 @@ function conboard_screen_sessions_archive(): string {
 	return conboard_screen_pages( $pages );
 }
 
-function conboard_screen_presenters_archive(): string {
+// Pages of presenter tiles (also used by Display Board slides)
+function conboard_screen_presenter_pages( array $presenters, int $per_page = 8, string $heading = '' ): array {
 
 	$tiles = [];
 
-	foreach ( conboard_get_presenters() as $presenter ) {
+	foreach ( $presenters as $presenter ) {
 		$tiles[] = conboard_screen_tile(
 			get_the_post_thumbnail( $presenter->ID, 'medium' ),
 			get_the_title( $presenter ),
@@ -306,15 +307,22 @@ function conboard_screen_presenters_archive(): string {
 		);
 	}
 
-	return $tiles ? conboard_screen_pages( conboard_screen_tile_pages( $tiles ) ) : conboard_screen_empty( 'No presenters yet' );
+	return conboard_screen_tile_pages( $tiles, $per_page, $heading );
 }
 
-// Sponsor loop: a page per level (split further when a level has many sponsors)
-function conboard_screen_sponsors_archive(): string {
+function conboard_screen_presenters_archive(): string {
+
+	$pages = conboard_screen_presenter_pages( conboard_get_presenters() );
+
+	return $pages ? conboard_screen_pages( $pages ) : conboard_screen_empty( 'No presenters yet' );
+}
+
+// Pages of sponsor logos: a page per level (split further when a level has many sponsors)
+function conboard_screen_sponsor_pages( array $levels = [], int $per_page = 8 ): array {
 
 	$pages = [];
 
-	foreach ( conboard_get_sponsor_groups() as $group ) {
+	foreach ( conboard_get_sponsor_groups([ 'levels' => $levels ]) as $group ) {
 
 		$tiles = [];
 
@@ -322,17 +330,25 @@ function conboard_screen_sponsors_archive(): string {
 			$tiles[] = conboard_screen_tile( get_the_post_thumbnail( $sponsor->ID, 'medium' ), get_the_title( $sponsor ), '', 'cb-tile-logo' );
 		}
 
-		$pages = array_merge( $pages, conboard_screen_tile_pages( $tiles, 8, $group['plural'] ) );
+		$pages = array_merge( $pages, conboard_screen_tile_pages( $tiles, $per_page, $group['plural'] ) );
 	}
+
+	return $pages;
+}
+
+function conboard_screen_sponsors_archive(): string {
+
+	$pages = conboard_screen_sponsor_pages();
 
 	return $pages ? conboard_screen_pages( $pages, 'cb-sponsor-loop' ) : conboard_screen_empty( 'No sponsors yet' );
 }
 
-function conboard_screen_staff_archive(): string {
+// Pages of staff tiles
+function conboard_screen_staff_pages( array $staff, int $per_page = 8, string $heading = '' ): array {
 
 	$tiles = [];
 
-	foreach ( conboard_get_staff() as $member ) {
+	foreach ( $staff as $member ) {
 		$tiles[] = conboard_screen_tile(
 			get_the_post_thumbnail( $member->ID, 'medium' ),
 			get_the_title( $member ),
@@ -341,7 +357,14 @@ function conboard_screen_staff_archive(): string {
 		);
 	}
 
-	return $tiles ? conboard_screen_pages( conboard_screen_tile_pages( $tiles ) ) : conboard_screen_empty( 'No staff listed yet' );
+	return conboard_screen_tile_pages( $tiles, $per_page, $heading );
+}
+
+function conboard_screen_staff_archive(): string {
+
+	$pages = conboard_screen_staff_pages( conboard_get_staff() );
+
+	return $pages ? conboard_screen_pages( $pages ) : conboard_screen_empty( 'No staff listed yet' );
 }
 
 // Announcements: one per page, urgent first. Only current ones that are allowed on screens.

@@ -62,3 +62,10 @@ Reusable as is: scaling and orientation shell, URL overrides, refresh, QR, scree
 - Sessions have a Cancelled switch; cancelled sessions show struck through with a badge.
 - The Location, Schedule and Presenter screens now use the same cards, so they are live too.
 - Not yet: pinning the current session to the top, grouping by track, side-by-side handling of overlapping sessions in one grid column, simulated time in the editor preview (the `conboard_now` filter is the hook for it).
+
+## 7. Phase 3 as built (content slides)
+
+- New slide types: Sponsor Showcase (logo grid, a page per level, or one sponsor at a time), Presenter (a chosen one, or keynote/featured presenters), Session, Generated List (presenters, keynotes, staff, sponsors or upcoming sessions, as a photo grid or one slide each), General Information (text, Wi-Fi details), Wayfinding (location, directions, map), plus a QR address on Custom Content.
+- These reuse the Screen Mode pages (`conboard_screen_presenter()`, `conboard_screen_session()`, sponsor and staff tiles), so a slide looks like the screen for that page.
+- A slide can produce several screens (render returns a list of pages). Each page can set `url`; the corner QR code follows the page that is showing (a session's page, a sponsor's website, a Wi-Fi join code) and returns to the default when a page has none.
+- Not yet: alternative presentation templates per type (for example a timeline view of a room schedule), randomized or weighted sponsor rotation.
