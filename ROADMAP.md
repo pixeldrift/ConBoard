@@ -8,7 +8,7 @@ Updated Nov 3, 2026. Phases 0-3 are built (on `main`); the sections below list w
 - Time-aware core: Now/Next, starting-soon and in-progress states, schedule views, Event Days in Settings.
 - Display Boards: slide registry, Now/Next, daily and room schedules, sponsors, presenters, sessions, generated lists, general info, wayfinding; starter board on activation.
 - Native row editor, Session Presenters box, unified Links list; sponsor levels in Settings.
-- JPG export per screen or board.
+- JPG export per screen or board, plus ZIP export: one board ("Save all pages as ZIP" in the screen menu) or all boards from the Display Boards list (folder per board, or everything in the root).
 - Maps: live layer preview, parent-map fallback, Show Map toggle, overlay + labels stack for image maps.
 - Admin polish: Add New titles, column widths, per-session Room Setup, global defaults, Markdown bullets.
 - Conflict column in the Sessions list.
@@ -18,7 +18,7 @@ Updated Nov 3, 2026. Phases 0-3 are built (on `main`); the sections below list w
 - Conflicts: visual report page, alternate room suggestions, Display Board awareness, prevent at save (optional).
 - Display Boards Phase 4: layouts, ticker, interruptions, scheduled slides, board editor live preview.
 - Split first/last name for Presenters and Staff (decision pending).
-- Batch export of many boards.
+
 
 ## Later
 - PSD layers, CSV import/export, badges and printed programs, registration and ticketing.

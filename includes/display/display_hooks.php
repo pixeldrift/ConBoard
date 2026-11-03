@@ -33,9 +33,17 @@ function conboard_register_screen_assets(): void {
 	);
 
 	wp_register_script(
+		'conboard-zip',
+		CONBOARD_PLUGIN_URL . 'assets/js/zip_store.js',
+		[],
+		'0.1.0',
+		true
+	);
+
+	wp_register_script(
 		'conboard-signage',
 		CONBOARD_PLUGIN_URL . 'assets/js/signage.js',
-		[ 'conboard-qrcode', 'conboard-html-to-image' ],
+		[ 'conboard-qrcode', 'conboard-html-to-image', 'conboard-zip' ],
 		'0.1.0',
 		true
 	);

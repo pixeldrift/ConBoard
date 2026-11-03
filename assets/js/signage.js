@@ -383,7 +383,8 @@
 		return new Promise( function ( resolve ) { window.setTimeout( resolve, ms ); } );
 	}
 
-	function exportJpg( all ) {
+	function exportJpg( all, mode ) {
+		mode = mode || 'download';   // 'download' (one file each), 'zip' (one ZIP), 'data' (hand the pictures to a parent page)
 		var lib = window.htmlToImage;
 
 		if ( exporting ) {
@@ -428,6 +429,7 @@
 		}
 
 		var saved = 0;
+		var files = [];
 		var chain = Promise.resolve();
 
 		indexes.forEach( function ( index, n ) {
@@ -449,17 +451,32 @@
 				} )
 				.then( function ( dataUrl ) {
 					var number = index + 1;
-					download( dataUrl, base + '-' + ( number < 10 ? '0' : '' ) + number + '.jpg' );
+					var fileName = base + '-' + ( number < 10 ? '0' : '' ) + number + '.jpg';
+					files.push( { name: fileName, dataUrl: dataUrl } );
 					saved++;
-					return wait( 350 );
+					if ( mode === 'download' ) {
+						download( dataUrl, fileName );
+						return wait( 350 );
+					}
 				} );
 		} );
 
 		return chain
 			.then( function () {
-				toast( saved === 1 ? 'Saved 1 picture.' : 'Saved ' + saved + ' pictures.' );
+				if ( mode === 'zip' && files.length && window.ConBoardZip ) {
+					var url = window.URL.createObjectURL( window.ConBoardZip.build( files ) );
+					download( url, base + '.zip' );
+					window.setTimeout( function () { window.URL.revokeObjectURL( url ); }, 10000 );
+				}
+				if ( mode === 'data' && window.parent !== window ) {
+					window.parent.postMessage( { type: 'conboard-export', name: base, files: files }, window.location.origin );
+				}
+				toast( mode === 'zip' ? 'Saved a ZIP with ' + saved + ( saved === 1 ? ' picture.' : ' pictures.' ) : ( saved === 1 ? 'Saved 1 picture.' : 'Saved ' + saved + ' pictures.' ) );
 			} )
 			.catch( function () {
+				if ( mode === 'data' && window.parent !== window ) {
+					window.parent.postMessage( { type: 'conboard-export', name: base, files: [], error: true }, window.location.origin );
+				}
 				toast( 'Could not save the picture. Images from other websites cannot be saved.' );
 			} )
 			.then( function () {
@@ -478,9 +495,9 @@
 			requested = new URL( window.location.href ).searchParams.get( 'export' ) || '';
 		} catch ( e ) { return; }
 
-		if ( requested === 'jpg' || requested === 'all' ) {
+		if ( requested === 'jpg' || requested === 'all' || requested === 'zip' || requested === 'data' ) {
 			window.addEventListener( 'load', function () {
-				window.setTimeout( function () { exportJpg( true ); }, 1200 );
+				window.setTimeout( function () { exportJpg( true, requested === 'zip' || requested === 'data' ? requested : 'download' ); }, 1200 );
 			} );
 		}
 	} )();
@@ -558,6 +575,10 @@
 			case 'export-page':
 				exportJpg( false );
 				return;
+
+			case 'export-zip':
+				exportJpg( true, 'zip' );
+				break;
 
 			case 'export-all':
 				exportJpg( true );

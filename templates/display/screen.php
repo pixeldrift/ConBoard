@@ -81,6 +81,7 @@ wp_add_inline_script( 'conboard-signage', 'window.ConBoardScreen = ' . wp_json_e
 			<button type="button" data-action="qr">Show / hide QR code</button>
 			<button type="button" data-action="export-page">Save this page as JPG</button>
 			<button type="button" data-action="export-all">Save all pages as JPG</button>
+			<button type="button" data-action="export-zip">Save all pages as ZIP</button>
 			<button type="button" data-action="reset">Reset to defaults</button>
 		</div>
 	</div>
