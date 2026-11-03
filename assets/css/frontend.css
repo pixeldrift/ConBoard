@@ -1,0 +1,159 @@
+/* ConBoard front-end styles. Kept neutral so the theme's fonts and colors show through. */
+
+/* Grids */
+.conboard-grid {
+	display: grid;
+	grid-template-columns: repeat(var(--conboard-cols, 4), minmax(0, 1fr));
+	gap: 1.5rem;
+	list-style: none;
+	margin: 1rem 0;
+	padding: 0;
+}
+
+@media (max-width: 782px) {
+	.conboard-grid { grid-template-columns: repeat(min(var(--conboard-cols, 4), 2), minmax(0, 1fr)); }
+}
+
+@media (max-width: 480px) {
+	.conboard-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Cards (sponsors and presenters) */
+.conboard-card {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.4rem;
+	height: 100%;
+	text-align: center;
+	text-decoration: none;
+	color: inherit;
+}
+
+a.conboard-card:hover .conboard-card-name,
+a.conboard-card:focus .conboard-card-name {
+	text-decoration: underline;
+}
+
+.conboard-card-logo,
+.conboard-card-photo {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+}
+
+.conboard-card-logo img {
+	width: auto;
+	max-width: 100%;
+	max-height: 120px;
+	object-fit: contain;
+}
+
+.conboard-card-photo img {
+	width: 100%;
+	height: auto;
+	aspect-ratio: 1 / 1;
+	object-fit: cover;
+	border-radius: 50%;
+}
+
+.conboard-card-name { font-weight: 600; }
+.conboard-card-subtitle { font-size: 0.9em; opacity: 0.75; }
+
+.conboard-card-badge {
+	display: inline-block;
+	padding: 0.1em 0.6em;
+	border: 1px solid currentColor;
+	border-radius: 999px;
+	font-size: 0.75em;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+}
+
+/* Sponsor levels */
+.conboard-sponsor-level { margin: 2rem 0; }
+.conboard-sponsor-level-title { margin-bottom: 0.5rem; }
+
+/* Carousel */
+.conboard-carousel {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin: 1rem 0;
+}
+
+.conboard-carousel-track {
+	display: flex;
+	flex: 1;
+	gap: 1.5rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	overflow-x: auto;
+	scroll-snap-type: x mandatory;
+	scrollbar-width: none;
+}
+
+.conboard-carousel-track::-webkit-scrollbar { display: none; }
+
+.conboard-carousel-item {
+	flex: 0 0 calc((100% - (var(--conboard-cols, 4) - 1) * 1.5rem) / var(--conboard-cols, 4));
+	scroll-snap-align: start;
+}
+
+@media (max-width: 782px) {
+	.conboard-carousel-item { flex-basis: calc((100% - 1.5rem) / 2); }
+}
+
+@media (max-width: 480px) {
+	.conboard-carousel-item { flex-basis: 100%; }
+}
+
+.conboard-carousel-btn {
+	flex: none;
+	width: 2.25rem;
+	height: 2.25rem;
+	border: 1px solid currentColor;
+	border-radius: 50%;
+	background: transparent;
+	color: inherit;
+	font-size: 1.4rem;
+	line-height: 1;
+	cursor: pointer;
+}
+
+.conboard-carousel-btn[hidden] { display: none; }
+
+/* Featured speaker */
+.conboard-featured-speaker {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1.5rem;
+	align-items: flex-start;
+	margin: 1rem 0;
+}
+
+.conboard-featured-photo { flex: 0 0 220px; max-width: 100%; }
+.conboard-featured-photo img { width: 100%; height: auto; border-radius: 8px; }
+.conboard-featured-body { flex: 1 1 260px; }
+.conboard-featured-name { margin: 0.3rem 0; }
+
+/* Page layouts */
+.conboard-location-map svg,
+.conboard-location-map img { max-width: 100%; height: auto; }
+
+.location-details { display: grid; grid-template-columns: max-content 1fr; gap: 0.25rem 1rem; }
+.location-details dt { font-weight: 600; }
+.location-details dd { margin: 0; }
+
+.location-session-list,
+.presenter-session-list,
+.session-presenters { list-style: none; padding: 0; }
+
+.location-session-list li,
+.presenter-session-list li { margin: 0.5rem 0; }
+
+.session-current { font-weight: 600; }
+.session-past { opacity: 0.6; }

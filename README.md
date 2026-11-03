@@ -131,6 +131,22 @@ Display Board Examples:
 - A branded signage loop between sessions
 - A multi-panel board showing announcements + now/next + sponsor logos
 
+## Shortcodes
+
+Drop ConBoard content into any page or post. All options are optional.
+
+- `[conboard_sponsors]`: sponsor logos grouped under a heading per level.
+  - `layout="levels|grid|carousel"`, `level="gold,silver"`, `columns="4"`, `limit="12"`
+  - `link="page|website|none"` sets where a logo goes when clicked, `names="yes"` shows names under logos
+  - `autoplay="yes"` and `speed="4"` (seconds) apply to the carousel
+- `[conboard_presenters]`: a grid or carousel of presenters. Keynote speakers come first, then featured presenters.
+  - `featured="yes"`, `keynote="yes"`, `layout="grid|carousel"`, `columns="3"`, `limit="6"`, `titles="yes|no"`
+- `[conboard_featured_speaker]`: a spotlight on one presenter with photo, bio excerpt and their next session. Great for the home page.
+  - `id="123"` picks a specific presenter. Otherwise it uses a keynote speaker (or a featured presenter), and `random="yes"` picks one at random.
+- `[current_session location="123"]`: what is happening now in a location.
+
+Mark presenters as **Keynote Speaker** or **Featured Presenter** on their edit screen.
+
 ## Screen Casting
 
 The easiest way to present *ConBoard* info screens on a TV or projector is connecting directly from a laptop or desktop computer over an HDMI cable. Because *ConBoard* is fully web-based, any device with a web browser should work. Alternatively, there are inexpensive wireless video transmitters that plug in to your HDMI port and are seen as standard monitor. It is recommended to use "Extend" mode and treat that screen as a second monitor rather than "Mirror" mode. Then simply navigate to the desired URL and enter the browser's fullscreen mode. The number of screens you can stream to depends on your computer hardware and how many video outputs are available. If you want the same content going to multiple screens, you can use a simple HDMI splitter/duplicator.

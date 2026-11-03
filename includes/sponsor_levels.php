@@ -4,9 +4,9 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 //
-// Sponsor level definitions
+// Built-in sponsor level definitions (used until levels are saved on the Settings page)
 //
-function conboard_get_sponsor_levels() {
+function conboard_get_default_sponsor_levels() {
 	return [
 		'platinum'	=> [
 			'singular'	=> 'Platinum Sponsor',
@@ -33,6 +33,21 @@ function conboard_get_sponsor_levels() {
 			'order'		=> 4,
 		],
 	];
+}
+
+
+//
+// Active sponsor levels: the ones saved in Settings, otherwise the defaults. Sorted by order.
+//
+function conboard_get_sponsor_levels() {
+	$stored = get_option( 'conboard_sponsor_levels' );
+	$levels = ( is_array( $stored ) && ! empty( $stored ) ) ? $stored : conboard_get_default_sponsor_levels();
+
+	uasort( $levels, function ( $a, $b ) {
+		return ( $a['order'] ?? 999 ) <=> ( $b['order'] ?? 999 );
+	});
+
+	return $levels;
 }
 
 

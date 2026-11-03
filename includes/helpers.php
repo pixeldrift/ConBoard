@@ -16,7 +16,9 @@ function conboard_get_sponsor_level_choices() {
 }
 
 function conboard_get_default_sponsor_level(): string {
-	return 'community';
+	$keys = array_keys( conboard_get_sponsor_levels() );
+
+	return $keys ? (string) end( $keys ) : '';
 }
 
 function conboard_get_sponsor_level_label( string $level ): string {

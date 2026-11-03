@@ -17,7 +17,7 @@ acf_add_local_field_group([
 	],
 	'fields' => [
 		[
-			'key'			=> 'field_staff_pronouns',
+			'key'			=> 'field_conboard_presenter_pronouns',
 			'label'			=> 'Pronouns',
 			'name'			=> 'pronouns',
 			'type'			=> 'text',
@@ -45,6 +45,24 @@ acf_add_local_field_group([
 			'type'			=> 'email',
 		],
 		
+		[
+			'key'			=> 'field_conboard_presenter_keynote',
+			'label'			=> 'Keynote Speaker',
+			'name'			=> 'keynote_speaker',
+			'type'			=> 'true_false',
+			'ui'			=> 1,
+			'instructions'	=> 'Highlight as a keynote speaker.',
+		],
+
+		[
+			'key'			=> 'field_conboard_presenter_featured',
+			'label'			=> 'Featured Presenter',
+			'name'			=> 'featured_presenter',
+			'type'			=> 'true_false',
+			'ui'			=> 1,
+			'instructions'	=> 'Feature on the home page and at the top of the Presenters page.',
+		],
+
 		[
 			'key'			=> 'field_conboard_presenter_websites',
 			'label'			=> 'Websites',

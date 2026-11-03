@@ -41,6 +41,8 @@ require_once CONBOARD_PLUGIN_PATH . 'includes/defaults.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/shortcodes.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/taxonomies.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/templates.php';
+require_once CONBOARD_PLUGIN_PATH . 'includes/frontend/frontend_assets.php';
+require_once CONBOARD_PLUGIN_PATH . 'includes/frontend/frontend_render.php';
 
 // Map handling code
 require_once CONBOARD_PLUGIN_PATH . 'includes/maps/maps_core.php';
