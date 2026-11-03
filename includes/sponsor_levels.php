@@ -80,3 +80,25 @@ add_action('acf/save_post', function ( $post_id ) {
 	);
 
 }, 20); // after ACF saves fields
+
+// Clears the level from every sponsor that uses it. Not called yet: meant for when a level is deleted
+// in Settings. (This was found pasted into assets/js/sponsor_levels.js, where it broke the script.)
+function conboard_unlink_sponsor_level( string $slug ): void {
+
+	$query = new WP_Query([
+		'post_type'			=> 'sponsor',
+		'posts_per_page' => -1,
+		'meta_query'		 => [
+			[
+				'key'	 => 'sponsor_level',
+				'value' => $slug,
+			],
+		],
+		'fields' => 'ids',
+	]);
+
+	foreach ( $query->posts as $post_id ) {
+		delete_post_meta( $post_id, 'sponsor_level' );
+		delete_post_meta( $post_id, 'sponsor_level_order' );
+	}
+}

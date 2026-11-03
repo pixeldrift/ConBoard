@@ -54,7 +54,6 @@ require_once CONBOARD_PLUGIN_PATH . 'includes/acf/acf_location.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/acf/acf_session.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/acf/acf_sponsor.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/acf/acf_staff.php';
-require_once CONBOARD_PLUGIN_PATH . 'includes/acf/acf_display_board.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/acf/acf_announcement.php';
 
 // Post Types - Order matters
@@ -73,6 +72,7 @@ require_once CONBOARD_PLUGIN_PATH . 'includes/display/display_hooks.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/display/display_params.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/display/display_qr_code.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/display/display_screens.php';
+require_once CONBOARD_PLUGIN_PATH . 'includes/display/display_slides.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/display/display_routing.php';
 
 // Admin - Order matters
@@ -87,7 +87,7 @@ if (is_admin()) {
 	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_list_icons.php';
 	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_notices.php';
 	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_about.php';
-	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_display_board_actions.php';
+	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_display_board.php';
 	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_location_metaboxes.php';
 	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_screen_link.php';
 	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_row_editor.php';

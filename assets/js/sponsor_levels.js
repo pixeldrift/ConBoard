@@ -46,26 +46,6 @@ document.getElementById('conboard-add-level').addEventListener('click', () => {
 });
 
 
-function conboard_unlink_sponsor_level( string $slug ): void {
-
-	$query = new WP_Query([
-		'post_type'			=> 'sponsor',
-		'posts_per_page' => -1,
-		'meta_query'		 => [
-			[
-				'key'	 => 'sponsor_level',
-				'value' => $slug,
-			],
-		],
-		'fields' => 'ids',
-	]);
-
-	foreach ( $query->posts as $post_id ) {
-		delete_post_meta( $post_id, 'sponsor_level' );
-		delete_post_meta( $post_id, 'sponsor_level_order' );
-	}
-}
-
 container.addEventListener('click', e => {
 
 	const row = e.target.closest('.conboard-level-row');

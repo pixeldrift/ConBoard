@@ -30,6 +30,20 @@
 			}
 		}
 
+		// Show or hide fields that depend on another field of the same row (data-show-field / data-show-in)
+		function updateVisibility( row ) {
+			row.querySelectorAll( '[data-show-field]' ).forEach( function ( wrap ) {
+				var source = row.querySelector( '[data-field="' + wrap.getAttribute( 'data-show-field' ) + '"] select, [data-field="' + wrap.getAttribute( 'data-show-field' ) + '"] input' );
+				var allowed = wrap.getAttribute( 'data-show-in' ).split( ',' );
+
+				wrap.hidden = ! ( source && allowed.indexOf( source.value ) !== -1 );
+			} );
+		}
+
+		function updateAllVisibility() {
+			rows().forEach( updateVisibility );
+		}
+
 		function add() {
 			var holder = document.createElement( 'ul' );
 			holder.innerHTML = template.innerHTML;
@@ -38,10 +52,13 @@
 			if ( row ) {
 				list.appendChild( row );
 				renumber();
+				updateVisibility( row );
 				var first = row.querySelector( 'select, input' );
 				if ( first ) { first.focus(); }
 			}
 		}
+
+		updateAllVisibility();
 
 		box.querySelector( '.conboard-rows-add' ).addEventListener( 'click', add );
 
@@ -55,6 +72,20 @@
 
 			if ( button.classList.contains( 'conboard-row-remove' ) ) {
 				list.removeChild( row );
+			} else if ( button.classList.contains( 'conboard-row-duplicate' ) ) {
+				var copy = row.cloneNode( true );
+				var from = row.querySelectorAll( 'select, textarea, input' );
+				var to = copy.querySelectorAll( 'select, textarea, input' );
+
+				for ( var i = 0; i < from.length; i++ ) {
+					if ( from[ i ].type === 'checkbox' ) {
+						to[ i ].checked = from[ i ].checked;
+					} else {
+						to[ i ].value = from[ i ].value;
+					}
+				}
+
+				list.insertBefore( copy, row.nextElementSibling );
 			} else if ( button.classList.contains( 'conboard-row-up' ) && row.previousElementSibling ) {
 				list.insertBefore( row, row.previousElementSibling );
 			} else if ( button.classList.contains( 'conboard-row-down' ) && row.nextElementSibling ) {
@@ -62,6 +93,57 @@
 			}
 
 			renumber();
+			updateAllVisibility();
+		} );
+
+		list.addEventListener( 'change', function ( event ) {
+			var row = event.target.closest( '.conboard-row' );
+
+			if ( row ) {
+				updateVisibility( row );
+			}
+		} );
+
+		// Image fields use the WordPress media library
+		list.addEventListener( 'click', function ( event ) {
+			var choose = event.target.closest( '.conboard-row-image-choose' );
+			var clear = event.target.closest( '.conboard-row-image-clear' );
+			var holder = ( choose || clear ) && ( choose || clear ).closest( '.conboard-row-image' );
+
+			if ( ! holder ) {
+				return;
+			}
+
+			var input = holder.querySelector( 'input' );
+			var preview = holder.querySelector( '.conboard-row-image-preview' );
+
+			if ( clear ) {
+				input.value = '';
+				preview.innerHTML = '';
+				return;
+			}
+
+			if ( ! window.wp || ! window.wp.media ) {
+				return;
+			}
+
+			var frame = window.wp.media( { title: 'Choose image', multiple: false, library: { type: 'image' } } );
+
+			frame.on( 'select', function () {
+				var attachment = frame.state().get( 'selection' ).first().toJSON();
+				var sizes = attachment.sizes || {};
+				var src = ( sizes.thumbnail || sizes.full || attachment ).url;
+
+				input.value = attachment.id;
+				preview.innerHTML = '';
+
+				var img = document.createElement( 'img' );
+				img.src = src;
+				img.alt = '';
+				preview.appendChild( img );
+			} );
+
+			frame.open();
 		} );
 
 		list.addEventListener( 'dragstart', function ( event ) {

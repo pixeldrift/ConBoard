@@ -53,9 +53,18 @@ function conboard_sanitize_rows( $raw, array $fields ): array {
 
 			if ( $type === 'select' ) {
 				$choices = array_map( 'strval', array_keys( $field['choices'] ?? [] ) );
-				$value   = in_array( $value, $choices, true ) ? $value : (string) ( $field['default'] ?? '' );
+				$value   = in_array( $value, $choices, true ) ? $value : ( ! empty( $field['strict'] ) ? '' : (string) ( $field['default'] ?? '' ) );
 			} elseif ( $type === 'url' ) {
 				$value = esc_url_raw( trim( $value ) );
+			} elseif ( $type === 'textarea' ) {
+				$value = sanitize_textarea_field( $value );
+			} elseif ( $type === 'checkbox' ) {
+				$value = $value === '1' ? '1' : '0';
+			} elseif ( $type === 'number' ) {
+				$value = $value === '' ? '' : (string) max( (int) ( $field['min'] ?? 0 ), min( (int) ( $field['max'] ?? 100000 ), (int) $value ) );
+			} elseif ( $type === 'image' ) {
+				$value = (string) absint( $value );
+				$value = ( $value !== '0' && get_post_type( (int) $value ) === 'attachment' ) ? $value : '';
 			} else {
 				$value = sanitize_text_field( $value );
 			}
@@ -95,6 +104,31 @@ function conboard_get_row_editor_field_html( string $name, $index, string $key, 
 		return $html . '</select>';
 	}
 
+	if ( $type === 'textarea' ) {
+		return '<textarea name="' . $input . '" rows="' . (int) ( $field['rows'] ?? 3 ) . '" class="widefat">' . esc_textarea( $value ) . '</textarea>';
+	}
+
+	if ( $type === 'checkbox' ) {
+		return '<input type="hidden" name="' . $input . '" value="0"><input type="checkbox" name="' . $input . '" value="1"' . ( $value === '1' ? ' checked' : '' ) . '>';
+	}
+
+	if ( $type === 'number' ) {
+		$attrs = ' min="' . (int) ( $field['min'] ?? 0 ) . '"' . ( isset( $field['max'] ) ? ' max="' . (int) $field['max'] . '"' : '' );
+		return '<input type="number" name="' . $input . '" value="' . esc_attr( $value ) . '"' . $attrs . ' class="small-text">';
+	}
+
+	if ( $type === 'image' ) {
+		$id      = (int) $value;
+		$preview = $id ? wp_get_attachment_image( $id, 'thumbnail' ) : '';
+
+		return '<span class="conboard-row-image">'
+			. '<input type="hidden" name="' . $input . '" value="' . esc_attr( $value ) . '">'
+			. '<span class="conboard-row-image-preview">' . $preview . '</span>'
+			. '<button type="button" class="button conboard-row-image-choose">Choose image</button> '
+			. '<button type="button" class="button-link conboard-row-image-clear">Remove</button>'
+			. '</span>';
+	}
+
 	return '<input type="' . ( $type === 'url' ? 'url' : 'text' ) . '" name="' . $input . '" value="' . esc_attr( $value ) . '" class="widefat">';
 }
 
@@ -106,7 +140,13 @@ function conboard_get_row_editor_row_html( string $name, $index, array $fields, 
 	foreach ( $fields as $key => $field ) {
 		$value = (string) ( $values[ $key ] ?? ( $field['default'] ?? '' ) );
 
-		$html .= '<label class="conboard-row-field"><span>' . esc_html( $field['label'] ?? $key ) . '</span>';
+		$show = '';
+		if ( ! empty( $field['show_when'] ) ) {
+			// [ 'field' => 'type', 'in' => [ 'welcome', 'custom' ] ]: only shown when that field has one of these values
+			$show = ' data-show-field="' . esc_attr( $field['show_when']['field'] ) . '" data-show-in="' . esc_attr( implode( ',', (array) $field['show_when']['in'] ) ) . '"';
+		}
+
+		$html .= '<label class="conboard-row-field' . ( ( $field['type'] ?? '' ) === 'checkbox' ? ' is-checkbox' : '' ) . '" data-field="' . esc_attr( $key ) . '"' . $show . '><span>' . esc_html( $field['label'] ?? $key ) . '</span>';
 		$html .= conboard_get_row_editor_field_html( $name, $index, $key, $field, $value );
 		$html .= '</label>';
 	}
@@ -114,6 +154,7 @@ function conboard_get_row_editor_row_html( string $name, $index, array $fields, 
 	$html .= '<span class="conboard-row-actions">';
 	$html .= '<button type="button" class="button conboard-row-up" title="Move up" aria-label="Move up">&uarr;</button>';
 	$html .= '<button type="button" class="button conboard-row-down" title="Move down" aria-label="Move down">&darr;</button>';
+	$html .= '<button type="button" class="button conboard-row-duplicate" title="Duplicate" aria-label="Duplicate">&#10064;</button>';
 	$html .= '<button type="button" class="button conboard-row-remove" title="Remove" aria-label="Remove">&times;</button>';
 	$html .= '</span>';
 	$html .= '</li>';
@@ -141,6 +182,13 @@ function conboard_render_row_editor( string $name, array $rows, array $fields, a
 
 		?>
 		<style>
+			.conboard-rows.is-stacked .conboard-row { flex-wrap: wrap; align-items: flex-start; }
+			.conboard-rows.is-stacked .conboard-row-field { flex: 1 1 30%; min-width: 180px; }
+			.conboard-rows.is-stacked .conboard-row-field.is-checkbox { flex: 0 0 auto; min-width: 0; }
+			.conboard-rows.is-stacked .conboard-row-field[data-field="heading"],
+			.conboard-rows.is-stacked .conboard-row-field[data-field="message"],
+			.conboard-rows.is-stacked .conboard-row-field[data-field="text"] { flex-basis: 100%; }
+			.conboard-row-image-preview img { display: block; max-width: 80px; height: auto; margin-bottom: 4px; }
 			.conboard-rows-list { margin: 0 0 10px; padding: 0; list-style: none; }
 			.conboard-row { display: flex; gap: 10px; align-items: flex-end; margin: 0 0 6px; padding: 8px; background: #f6f7f7; border: 1px solid #dcdcde; border-radius: 3px; }
 			.conboard-row.is-dragging { opacity: .4; }
@@ -154,7 +202,11 @@ function conboard_render_row_editor( string $name, array $rows, array $fields, a
 		<?php
 	}
 
-	echo '<div class="conboard-rows" data-name="' . esc_attr( $name ) . '">';
+	if ( ! empty( $args['stacked'] ) ) {
+		wp_enqueue_media();
+	}
+
+	echo '<div class="conboard-rows' . ( ! empty( $args['stacked'] ) ? ' is-stacked' : '' ) . '" data-name="' . esc_attr( $name ) . '">';
 
 	echo '<ul class="conboard-rows-list">';
 	foreach ( array_values( $rows ) as $i => $row ) {

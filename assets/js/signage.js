@@ -133,11 +133,19 @@
 		pageIndex = index;
 	}
 
+	// Each page can set its own length with data-duration (seconds); otherwise the
+	// screen's default interval is used.
+	function pageSeconds( page ) {
+		var own = page ? parseInt( page.getAttribute( 'data-duration' ), 10 ) : 0;
+
+		return Math.max( 3, own > 0 ? own : state.interval );
+	}
+
 	function startPages() {
 		var pages = content.querySelectorAll( '.cb-page' );
 
 		if ( pageTimer ) {
-			window.clearInterval( pageTimer );
+			window.clearTimeout( pageTimer );
 			pageTimer = null;
 		}
 
@@ -147,10 +155,18 @@
 
 		showPage( Math.min( pageIndex, pages.length - 1 ) );
 
-		pageTimer = window.setInterval( function () {
-			var count = content.querySelectorAll( '.cb-page' ).length;
-			showPage( count ? ( pageIndex + 1 ) % count : 0 );
-		}, state.interval * 1000 );
+		function next() {
+			var all = content.querySelectorAll( '.cb-page' );
+
+			if ( all.length < 2 ) {
+				return;
+			}
+
+			showPage( ( pageIndex + 1 ) % all.length );
+			pageTimer = window.setTimeout( next, pageSeconds( all[ pageIndex ] ) * 1000 );
+		}
+
+		pageTimer = window.setTimeout( next, pageSeconds( pages[ pageIndex ] ) * 1000 );
 	}
 
 	// ---------------------------------------------------------------------

@@ -92,6 +92,7 @@ body.cb-screen.is-awake { cursor: default; }
 .cb-page { height: 100%; }
 .cb-page { display: none; }
 .cb-page.is-active { display: block; animation: cb-fade 0.6s ease; }
+.cb-pages[data-transition="none"] .cb-page.is-active { animation: none; }
 
 @keyframes cb-fade {
 	from { opacity: 0; }
@@ -257,3 +258,20 @@ body.is-awake #cb-menu { opacity: 1; }
 #cb-menu-panel button { padding: 8px 14px; text-align: left; }
 #cb-menu-panel button:hover,
 #cb-menu-toggle:hover { background: #334155; }
+
+/* Display Board slides */
+.cb-welcome,
+.cb-custom { display: flex; height: 100%; align-items: center; justify-content: center; text-align: center; }
+.cb-welcome { flex-direction: column; gap: 40px; }
+.cb-welcome-heading { margin: 0; font-size: 140px; line-height: 1.1; }
+.cb-welcome-message { margin: 0; font-size: 56px; color: var(--cb-muted); max-width: 1400px; }
+.cb-slide-image { display: block; max-width: 100%; max-height: 520px; width: auto; height: auto; }
+.cb-custom { gap: 64px; text-align: left; }
+.cb-custom:not(.has-image) { text-align: center; }
+.cb-custom-image { flex: 0 0 45%; }
+.cb-custom-image .cb-slide-image { max-height: 760px; margin: 0 auto; }
+.cb-custom-heading { margin: 0 0 24px; font-size: 96px; line-height: 1.1; color: var(--cb-accent); }
+.cb-custom-text { font-size: 52px; line-height: 1.35; }
+.cb-custom-text p { margin: 0 0 24px; }
+.cb-announcement-list { display: flex; flex-direction: column; gap: 28px; }
+.cb-announcement-item h3 { margin: 0 0 8px; font-size: 52px; }

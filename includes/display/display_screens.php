@@ -424,6 +424,7 @@ function conboard_screen_render_content(): string {
 			case 'sponsor':      return conboard_screen_sponsor( $post );
 			case 'staff':        return conboard_screen_staff( $post );
 			case 'announcement': return conboard_screen_announcement( $post );
+			case 'display_board': return conboard_screen_board( $post );
 		}
 
 		return '';

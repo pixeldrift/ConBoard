@@ -16,40 +16,25 @@ function conboard_is_display(): bool {
 
 // The post types that can be shown in Screen Mode
 function conboard_screen_post_types(): array {
-	return [ 'location', 'session', 'presenter', 'sponsor', 'staff', 'announcement' ];
+	return [ 'location', 'session', 'presenter', 'sponsor', 'staff', 'announcement', 'display_board' ];
 }
 
 /**
- * Settings saved on a Display Board (all optional).
- * Display Boards are mapped to Screen Mode in a later step; this is ready for them.
+ * Settings saved on a Display Board (see includes/display/display_slides.php).
  */
 function conboard_context_from_display_board( int $board_id ): array {
 
-	if ( ! function_exists( 'get_field' ) ) {
-		return [];
-	}
+	$board = conboard_get_board_settings( $board_id );
 
-	$settings = [];
-
-	$orientation = conboard_normalize_display_param( 'orientation', get_field( 'orientation', $board_id ) );
-	if ( $orientation !== null ) $settings['orientation'] = $orientation;
-
-	$rotate = conboard_normalize_display_param( 'rotate', get_field( 'rotation', $board_id ) );
-	if ( $rotate !== null ) $settings['rotate'] = $rotate;
-
-	$flip = conboard_normalize_display_param( 'flip', get_field( 'flip', $board_id ) );
-	if ( $flip !== null ) $settings['flip'] = $flip;
-
-	$interval = conboard_clamp_display_int( get_field( 'slide_interval', $board_id ), 3, 300 );
-	if ( $interval !== null && $interval > 0 ) $settings['interval'] = $interval;
-
-	$refresh = conboard_clamp_display_int( get_field( 'refresh_interval', $board_id ), 15, 3600 );
-	if ( $refresh !== null && $refresh > 0 ) $settings['refresh'] = $refresh;
-
-	$clock = get_field( 'show_clock', $board_id );
-	if ( $clock !== null && $clock !== '' ) $settings['clock'] = (bool) $clock;
-
-	return $settings;
+	return [
+		'orientation'	=> (string) $board['orientation'],
+		'rotate'		=> (string) $board['rotate'],
+		'flip'			=> (string) $board['flip'],
+		'interval'		=> (int) $board['interval'],
+		'refresh'		=> (int) $board['refresh'],
+		'clock'			=> (bool) $board['clock'],
+		'qr'			=> (bool) $board['qr'],
+	];
 }
 
 // Overrides present in the URL (only the ones that are valid)
@@ -91,6 +76,11 @@ function conboard_context_from_url(): array {
 
 // URL of the normal (non-screen) version of the current page; the QR code points here
 function conboard_get_screen_standard_url(): string {
+
+	// A Display Board has no ordinary version; its QR code points to the home page
+	if ( is_singular( 'display_board' ) ) {
+		return home_url( '/' );
+	}
 
 	if ( is_singular() ) {
 		return (string) get_permalink( get_queried_object_id() );

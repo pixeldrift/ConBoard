@@ -9,14 +9,14 @@ Core principle: enter information once, display it anywhere.
 | Piece | State |
 |---|---|
 | `display_board` CPT (`cpt_display_board.php`) | Registered, public, title only, slug `display`. Works; no editor fields. |
-| `acf_display_board.php` | Empty. No fields exist. |
+| `acf_display_board.php` | Removed (boards use post meta, not ACF fields). |
 | `conboard_context_from_display_board()` | Ready. Reads `orientation`, `rotation`, `flip`, `slide_interval`, `refresh_interval`, `show_clock`. Precedence is already defaults, then board, then URL. |
 | Routing (`display_routing.php`, `conboard_screen_post_types()`) | `display_board` is not routed to the screen shell; no renderer in `conboard_screen_render_content()`. |
 | `signage.js` | Page loop uses one global interval and `.cb-page` elements; refresh swaps `#cb-content` and keeps the page index; scaling, rotate/flip, clock, QR, menu all reusable. |
 | Time awareness | Server-side only (`conboard_get_session_state()`); states are frozen between refreshes. Does not meet the spec. |
-| `templates/single-conboard_display_board.php` | Empty stub, not mapped. Not needed in screen mode. |
+| `templates/single-conboard_display_board.php` | Removed. |
 | `defaults.php` / `conboard_create_default_display_boards()` | Empty stub. |
-| `admin_display_board_actions.php` | Dead: uses `display_mode`/`display_location` fields that do not exist. Remove or replace. |
+| `admin_display_board_actions.php` | Removed (dead code). |
 
 Reusable as is: scaling and orientation shell, URL overrides, refresh, QR, screen renderers (location now/next, session cards, sponsor tiles, announcements, tile pagination), sponsor levels, announcement flags.
 
@@ -44,3 +44,12 @@ Reusable as is: scaling and orientation shell, URL overrides, refresh, QR, scree
 - Cancelled sessions need a status field on sessions (not present yet); Phase 2 adds one.
 - Event "today" uses the site time zone; multi-day events rely on the Phase 2 event days setting.
 - Nothing here has been run in real WordPress yet; Phase 1 should be tested on the live site early.
+
+## 5. Phase 1 as built
+
+- Settings in `_conboard_board` post meta; slides in `_conboard_slides` (list of `type, enabled, duration, settings`). No ACF fields or Pro features.
+- `includes/display/display_slides.php`: registry (`conboard_register_slide_type`), storage, board rendering. Types so far: Welcome, Custom Content, Announcements.
+- `includes/admin/admin_display_board.php`: Slides (row editor) and Board Settings boxes. The row editor gained textarea, checkbox, number and image fields, conditional fields, and duplicate.
+- A board's plain link redirects to screen mode (other options in the address are kept). URL overrides still beat board settings.
+- `signage.js` uses per-slide `data-duration`; transition is `fade` or `none`.
+- A starter "Main Display" board is created on activation if there are no boards.

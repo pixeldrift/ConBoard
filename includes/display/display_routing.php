@@ -21,3 +21,15 @@ add_filter( 'template_include', function ( $template ) {
 
 	return $template;
 }, 20 );
+
+//
+// A Display Board only exists as a screen, so its plain link goes to screen mode.
+// Any other options in the address (rotate, flip, ...) are kept.
+//
+add_action( 'template_redirect', function () {
+
+	if ( is_singular( 'display_board' ) && ! conboard_is_display() ) {
+		wp_safe_redirect( add_query_arg( 'display', 'screen' ), 302 );
+		exit;
+	}
+});
