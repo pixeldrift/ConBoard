@@ -12,6 +12,7 @@ Updated Nov 3, 2026. Phases 0-3 are built (on `main`); the sections below list w
 - Maps: live layer preview, parent-map fallback, Show Map toggle, overlay + labels stack for image maps.
 - Admin polish: Add New titles, column widths, per-session Room Setup, global defaults, Markdown bullets.
 - Conflict column in the Sessions list.
+- `[conboard_schedule]` shortcode: live schedule on any page (day, room or flat grouping, filters, in-progress highlighting).
 - Program Planner (ConBoard > Program Planner): unscheduled cards, day grid with rooms as columns, drag to schedule, move, resize, unschedule (length kept), day arrows with prev/next strips; map pane (layers as drop zones, room list for maps without layers, room boxes with no map) with a red time line that follows the grid scroll, room highlights and title/time pills.
 
 ## Next

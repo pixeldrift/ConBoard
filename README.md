@@ -5,7 +5,7 @@ It provides a structured content system for:
 
 - Sessions
 - Presenters
-- Rooms
+- Locations (campuses, buildings, floors and rooms)
 - Sponsors
 - Staff
 - Announcements
@@ -52,7 +52,7 @@ Quick and easy digital signage already exists by default for all rooms, speakers
 
 Simply pull up any ConBoard powered page and add [`?display=screen`](?display=screen) after the web address. This will change the display template to be info board-friendly, with simplified details and a layout designed for a 16x9 screen.
 
-[`https://example.com/room/main-hall/?display=screen`](https://example.com/room/main-hall/?display=screen)
+[`https://example.com/location/main-hall/?display=screen`](https://example.com/location/main-hall/?display=screen)
 
 From the admin dashboard, you can open any ConBoard custom post and press the "Get Display Screen" button to retrieve the display link.
 
@@ -161,6 +161,10 @@ Drop ConBoard content into any page or post. All options are optional.
 - `[conboard_announcements]`: the latest announcements, newest first.
   - `limit="3"`, `excerpt="yes"` for a short preview, `dates="yes|no"`, `urgent="yes"` for urgent ones only
   - Mark an announcement **Urgent** to show it first with a label, switch **Show on Screens** off to keep it off info screens, and set **Expires** to hide it automatically.
+- `[conboard_schedule]`: the live schedule. Sessions highlight when they are in progress or starting soon, with a countdown and progress bar that update without reloading the page.
+  - `date="all|today|2026-01-24|day2"`, `group="day|room|none"` for headings by event day or by location
+  - `location="12,15"` (includes the rooms inside), `track="workshops,keynotes"` (Session Type slugs), `limit="10"`
+  - `completed="show|dim|hide"` for finished sessions, `cancelled="show|hide"`, `presenters="yes|no"`, `links="yes|no"`, `live="yes|no"`
 - `[current_session location="123"]`: what is happening now in a location.
 
 Mark presenters as **Keynote Speaker** or **Featured Presenter** on their edit screen.

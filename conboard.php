@@ -42,6 +42,7 @@ require_once CONBOARD_PLUGIN_PATH . 'includes/event_days.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/activation.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/defaults.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/shortcodes.php';
+require_once CONBOARD_PLUGIN_PATH . 'includes/shortcodes_schedule.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/taxonomies.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/templates.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/frontend/frontend_assets.php';

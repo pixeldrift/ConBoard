@@ -240,7 +240,7 @@ function conboard_schedule_query( array $args = [] ): array {
 // ---------------------------------------------------------------------------
 
 // "9:00 AM – 10:00 AM", with the weekday in front when it is not today
-function conboard_schedule_time_label( int $start, int $end, int $now = 0 ): string {
+function conboard_schedule_time_label( int $start, int $end, int $now = 0, bool $with_day = true ): string {
 
 	if ( $start <= 0 ) {
 		return '';
@@ -253,7 +253,7 @@ function conboard_schedule_time_label( int $start, int $end, int $now = 0 ): str
 		$label .= ' – ' . wp_date( 'g:i A', $end );
 	}
 
-	if ( wp_date( 'Y-m-d', $start ) !== wp_date( 'Y-m-d', $now ) ) {
+	if ( $with_day && wp_date( 'Y-m-d', $start ) !== wp_date( 'Y-m-d', $now ) ) {
 		$label = wp_date( 'l', $start ) . ' ' . $label;
 	}
 
@@ -268,17 +268,21 @@ function conboard_schedule_time_label( int $start, int $end, int $now = 0 ): str
  */
 function conboard_schedule_item_html( array $row, array $options = [] ): string {
 
-	$options = array_merge([ 'show_presenters' => true, 'hide_location' => 0, 'compact' => false, 'now' => 0 ], $options );
+	$options = array_merge([ 'show_presenters' => true, 'hide_location' => 0, 'compact' => false, 'now' => 0, 'link' => false, 'with_day' => true ], $options );
 	$state   = $row['cancelled'] ? 'cancelled' : $row['state'];
 
 	$html  = '<article class="cb-session cb-session-' . esc_attr( $state ) . ( $options['compact'] ? ' is-compact' : '' ) . '"';
 	$html .= ' data-start="' . (int) $row['start'] . '" data-end="' . (int) $row['end'] . '" data-state="' . esc_attr( $state ) . '">';
 
-	$html .= '<div class="cb-session-time">' . esc_html( conboard_schedule_time_label( $row['start'], $row['end'], (int) $options['now'] ) );
+	$html .= '<div class="cb-session-time">' . esc_html( conboard_schedule_time_label( $row['start'], $row['end'], (int) $options['now'], (bool) $options['with_day'] ) );
 	$html .= $row['cancelled'] ? ' <span class="cb-badge cb-badge-cancelled">Cancelled</span>' : '';
 	$html .= '</div>';
 
-	$html .= '<h3 class="cb-session-title">' . esc_html( $row['title'] ) . '</h3>';
+	$title = esc_html( $row['title'] );
+	if ( $options['link'] && $row['url'] ) {
+		$title = '<a href="' . esc_url( $row['url'] ) . '">' . $title . '</a>';
+	}
+	$html .= '<h3 class="cb-session-title">' . $title . '</h3>';
 
 	if ( $options['show_presenters'] && $row['presenters'] ) {
 		$html .= '<div class="cb-session-presenters">' . esc_html( implode( ', ', $row['presenters'] ) ) . '</div>';
