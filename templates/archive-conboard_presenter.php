@@ -8,7 +8,7 @@
 get_header();
 
 $query = new WP_Query([
-	'post_type'			=> 'conboard_presenter',
+	'post_type'			=> 'presenter',
 	'posts_per_page'	=> -1,
 	'orderby'			=> 'title',
 	'order'				=> 'ASC',
@@ -39,7 +39,7 @@ $query = new WP_Query([
 						<h2><?php the_title(); ?></h2>
 
 						<?php
-						$title = get_post_meta(get_the_ID(), 'title_org', true);
+						$title = get_post_meta(get_the_ID(), 'presenter_title', true);
 						if ($title) :
 						?>
 							<div class="presenter-title">

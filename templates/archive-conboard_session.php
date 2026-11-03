@@ -11,7 +11,7 @@ $now = current_time('timestamp');
 
 // Query all sessions, sorted by start time
 $query = new WP_Query([
-	'post_type'			=> 'conboard_session',
+	'post_type'			=> 'session',
 	'posts_per_page'	=> -1,
 	'meta_key'			=> 'start_time',
 	'orderby'			=> 'meta_value',
@@ -33,9 +33,9 @@ $query = new WP_Query([
 				<?php
 				$start = get_post_meta(get_the_ID(), 'start_time', true);
 				$end   = get_post_meta(get_the_ID(), 'end_time', true);
-				$room  = get_post_meta(get_the_ID(), 'room_id', true);
+				$room  = get_post_meta(get_the_ID(), 'location', true);
 
-				$state = conboard_get_session_state($start, $end);
+				$state = conboard_get_session_state(get_the_ID(), $now);
 				?>
 
 				<li class="session session-<?php echo esc_attr($state); ?>">

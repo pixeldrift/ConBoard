@@ -117,6 +117,7 @@ function conboard_locate_template($template_name) {
 		return $theme_template;
 	}
 
-	// 2. Plugin fallback
-	return CONBOARD_PLUGIN_PATH . 'templates/' . $template_name;
+	// 2. Plugin fallback (only if the file exists)
+	$plugin_template = CONBOARD_PLUGIN_PATH . 'templates/' . $template_name;
+	return file_exists($plugin_template) ? $plugin_template : '';
 }

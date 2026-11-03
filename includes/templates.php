@@ -9,30 +9,17 @@ add_filter('template_include', function ($template) {
 
 	$post_type = get_post_type();
 
+	// Keys are the registered post type slugs (see includes/post-types/).
+	// Only templates that are ready for use are mapped here. Others (announcement,
+	// display_board, location, sponsor, staff, single presenter) are still stubs
+	// or need rework, so the theme's own templates handle them for now.
 	$templates = [
-		'conboard_announcement' => [
-			'single'	=> 'single-conboard_announcement.php',
-			'archive'	=> 'archive-conboard_announcement.php',
-		],
-		'conboard_display_board' => [
-			'single'	=> 'single-conboard_display-board.php',
-		],
-		'conboard_presenter' => [
-			'single'	=> 'single-conboard_presenter.php',
+		'presenter' => [
 			'archive'	=> 'archive-conboard_presenter.php',
 		],
-		'conboard_location' => [
-			'single'	=> 'single-conboard_location.php',
-		],
-		'conboard_session' => [
+		'session' => [
 			'single'	=> 'single-conboard_session.php',
 			'archive'	=> 'archive-conboard_session.php',
-		],
-		'conboard_sponsor' => [
-			'single'	=> 'single-conboard_sponsor.php',
-		],
-		'conboard_staff' => [
-			'single'	=> 'single-conboard_staff.php',
 		],
 	];
 
@@ -40,14 +27,19 @@ add_filter('template_include', function ($template) {
 		return $template;
 	}
 
-	// Singular
+	$file = '';
+
 	if (is_singular() && !empty($templates[$post_type]['single'])) {
-		return conboard_locate_template($templates[$post_type]['single']);
+		$file = $templates[$post_type]['single'];
+	} elseif (is_post_type_archive() && !empty($templates[$post_type]['archive'])) {
+		$file = $templates[$post_type]['archive'];
 	}
 
-	// Archive
-	if (is_post_type_archive() && !empty($templates[$post_type]['archive'])) {
-		return conboard_locate_template($templates[$post_type]['archive']);
+	if ($file) {
+		$located = conboard_locate_template($file);
+		if ($located) {
+			return $located;
+		}
 	}
 
 	return $template;

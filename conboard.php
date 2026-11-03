@@ -5,9 +5,10 @@
  * Version: 0.1.0
  * Author: Nathan D. B. Pizar
  * Text Domain: conboard
+ * Requires PHP: 8.2
  */
 
-// PHP 7.4
+// Requires PHP 8.2+ (uses str_starts_with / str_contains). Tested for syntax on 8.3.
 
 
 if (!defined('ABSPATH')) exit;
