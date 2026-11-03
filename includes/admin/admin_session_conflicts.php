@@ -156,3 +156,59 @@ add_action('admin_notices', function () {
 
 
 
+
+
+/**
+ * Live conflict check for one session: other sessions in the same, parent or child location
+ * at overlapping times, plus sessions that share a presenter. Cancelled sessions are ignored.
+ *
+ * @return array{location: int[], presenter: int[]}  session ids
+ */
+function conboard_find_session_conflicts( int $session_id ): array {
+
+	$out = [ 'location' => [], 'presenter' => [] ];
+
+	if ( get_post_meta( $session_id, 'cancelled', true ) === '1' ) return $out;
+
+	$span = function ( int $id ): array {
+		$start = conboard_local_to_timestamp( get_post_meta( $id, 'start_time', true ) );
+		$end   = conboard_local_to_timestamp( get_post_meta( $id, 'end_time', true ) );
+		if ( $start && ( ! $end || $end <= $start ) ) $end = $start + conboard_default_session_minutes() * 60;
+		return [ $start, $end ];
+	};
+
+	[ $start, $end ] = $span( $session_id );
+	if ( ! $start ) return $out;
+
+	$location_id = (int) get_post_meta( $session_id, 'location', true );
+	$near        = $location_id ? conboard_get_overlapping_location_ids( $location_id ) : [];
+
+	$presenters = array_map( fn( $e ) => (int) $e['presenter_id'], conboard_get_session_presenters( $session_id ) );
+
+	$others = get_posts( [
+		'post_type'      => 'session',
+		'post_status'    => [ 'publish', 'future', 'draft', 'pending' ],
+		'posts_per_page' => -1,
+		'post__not_in'   => [ $session_id ],
+		'fields'         => 'ids',
+	] );
+
+	foreach ( $others as $other ) {
+
+		if ( get_post_meta( $other, 'cancelled', true ) === '1' ) continue;
+
+		[ $o_start, $o_end ] = $span( $other );
+		if ( ! $o_start || ! ( $start < $o_end && $end > $o_start ) ) continue;
+
+		if ( $near && in_array( (int) get_post_meta( $other, 'location', true ), $near, true ) ) {
+			$out['location'][] = $other;
+		}
+
+		if ( $presenters ) {
+			$theirs = array_map( fn( $e ) => (int) $e['presenter_id'], conboard_get_session_presenters( $other ) );
+			if ( array_intersect( $presenters, $theirs ) ) $out['presenter'][] = $other;
+		}
+	}
+
+	return $out;
+}

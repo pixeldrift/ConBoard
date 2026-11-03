@@ -188,6 +188,21 @@ function conboard_get_admin_columns_manifest(): array {
 		// Sessions Page
 		'session' => [
 			[
+				'key'		=> 'conflicts',
+				'label'		=> 'Conflicts',
+				'position'	=> 'last',
+				'render'	=> function ( $post_id ) {
+					$c = conboard_find_session_conflicts( (int) $post_id );
+					if ( ! $c['location'] && ! $c['presenter'] ) { echo '—'; return; }
+					$line = function ( string $what, array $ids ) {
+						$names = array_map( fn( $i ) => '<a href="' . esc_url( get_edit_post_link( $i ) ) . '">' . esc_html( get_the_title( $i ) ) . '</a>', $ids );
+						echo '<div style="color:#b32d2e">&#9888; ' . esc_html( $what ) . ': ' . implode( ', ', $names ) . '</div>';
+					};
+					if ( $c['location'] )  $line( 'Location overlaps', $c['location'] );
+					if ( $c['presenter'] ) $line( 'Presenter double-booked', $c['presenter'] );
+				},
+			],
+			[
 				'key'		=> 'session_time',
 				'label'		=> 'Time',
 				'sortable'	=> true,

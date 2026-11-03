@@ -72,7 +72,7 @@ x		Default Room setup
 
 	Prevent room conflicts at save 
 	OR Visual conflict report
-	Conflict summary column in Sessions list
+x	Conflict summary column in Sessions list (location overlaps and presenter double-booking)
 	Auto-suggest alternate rooms
 	Display Board conflict awareness
 	Add settings popup box for display screens
