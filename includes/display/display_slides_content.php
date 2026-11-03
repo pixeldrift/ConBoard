@@ -2,7 +2,7 @@
 // includes/display/display_slides_content.php
 //
 // Content slide types for Display Boards: Sponsor Showcase, Presenter, Session, Generated List,
-// General Information and Wayfinding. They reuse the Screen Mode pages (display_screens.php), so a
+// General Information, Location Info and Directional Sign. They reuse the Screen Mode pages (display_screens.php), so a
 // slide looks the same as the screen for that page.
 //
 // A slide can also set the address for the QR code in the corner while it is showing ('url').
@@ -275,11 +275,11 @@ conboard_register_slide_type( 'general_info', [
 
 
 // ---------------------------------------------------------------------------
-// Wayfinding: where something is
+// Location Info: a location's directions text and map (stored as 'wayfinding' so saved boards keep working)
 // ---------------------------------------------------------------------------
 
 conboard_register_slide_type( 'wayfinding', [
-	'label'		=> 'Wayfinding',
+	'label'		=> 'Location Info',
 	'fields'	=> fn() => [
 		'location'	=> [ 'label' => 'Location', 'type' => 'select', 'choices' => [ '' => '— Choose a location —' ] + conboard_get_post_choices( 'location' ) ],
 		'directions'=> [ 'label' => 'Directions (optional)', 'type' => 'textarea', 'rows' => 3 ],
@@ -306,5 +306,64 @@ conboard_register_slide_type( 'wayfinding', [
 		$html .= '</div>';
 
 		return conboard_slide_post_page( $location, $html );
+	},
+]);
+
+
+// ---------------------------------------------------------------------------
+// Directional Sign: big arrows with a bold label ("Registration" with an arrow pointing the way)
+// ---------------------------------------------------------------------------
+
+// Direction => degrees to turn an upward-pointing arrow
+function conboard_sign_directions(): array {
+	return [
+		'left'		=> [ 'label' => 'Left', 'deg' => 270 ],
+		'right'		=> [ 'label' => 'Right', 'deg' => 90 ],
+		'up'		=> [ 'label' => 'Straight ahead (up)', 'deg' => 0 ],
+		'down'		=> [ 'label' => 'Down', 'deg' => 180 ],
+		'up-left'	=> [ 'label' => 'Up and left', 'deg' => 315 ],
+		'up-right'	=> [ 'label' => 'Up and right', 'deg' => 45 ],
+		'down-left'	=> [ 'label' => 'Down and left', 'deg' => 225 ],
+		'down-right'=> [ 'label' => 'Down and right', 'deg' => 135 ],
+	];
+}
+
+// One sign row: arrow and label (arrow after the label when it points right)
+function conboard_sign_row_html( string $direction, string $label ): string {
+
+	$directions = conboard_sign_directions();
+
+	if ( $label === '' || ! isset( $directions[ $direction ] ) ) {
+		return '';
+	}
+
+	$arrow = '<svg class="cb-sign-arrow" viewBox="0 0 100 100" style="transform:rotate(' . (int) $directions[ $direction ]['deg'] . 'deg)" aria-hidden="true"><path d="M50 6 L94 52 H66 V94 H34 V52 H6 Z" fill="currentColor"/></svg>';
+	$text  = '<span class="cb-sign-label">' . esc_html( $label ) . '</span>';
+	$after = in_array( $direction, [ 'right', 'up-right', 'down-right' ], true );
+
+	return '<div class="cb-sign-row">' . ( $after ? $text . $arrow : $arrow . $text ) . '</div>';
+}
+
+conboard_register_slide_type( 'directional_sign', [
+	'label'		=> 'Directional Sign',
+	'fields'	=> fn() => [
+		'direction'		=> [ 'label' => 'Arrow', 'type' => 'select', 'choices' => wp_list_pluck( conboard_sign_directions(), 'label' ), 'default' => 'right' ],
+		'label'			=> [ 'label' => 'Big label (e.g. Registration)', 'type' => 'text' ],
+		'direction2'	=> [ 'label' => 'Second arrow (optional)', 'type' => 'select', 'choices' => [ '' => '— None —' ] + wp_list_pluck( conboard_sign_directions(), 'label' ) ],
+		'label2'		=> [ 'label' => 'Second label', 'type' => 'text' ],
+		'note'			=> [ 'label' => 'Small note (optional)', 'type' => 'text' ],
+	],
+	'render'	=> function ( array $s ) {
+
+		$rows = conboard_sign_row_html( (string) ( $s['direction'] ?? 'right' ), (string) ( $s['label'] ?? '' ) )
+			. conboard_sign_row_html( (string) ( $s['direction2'] ?? '' ), (string) ( $s['label2'] ?? '' ) );
+
+		if ( $rows === '' ) {
+			return '';
+		}
+
+		$note = (string) ( $s['note'] ?? '' );
+
+		return [ 'html' => '<div class="cb-sign">' . $rows . ( $note !== '' ? '<p class="cb-sign-note">' . esc_html( $note ) . '</p>' : '' ) . '</div>', 'url' => '' ];
 	},
 ]);

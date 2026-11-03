@@ -362,3 +362,10 @@ body.is-awake #cb-menu { opacity: 1; }
 #cb-sync[data-state="live"] .cb-sync-live { display: block; }
 #cb-sync .cb-sync-text { color: #ef4444; }
 .is-exporting #cb-sync { display: none; }
+
+/* Directional Sign slide */
+.cb-sign { display: flex; flex-direction: column; justify-content: center; height: 100%; gap: 80px; }
+.cb-sign-row { display: flex; align-items: center; justify-content: center; gap: 72px; }
+.cb-sign-arrow { flex: 0 0 auto; width: 300px; height: 300px; color: var(--cb-accent); }
+.cb-sign-label { font-size: 170px; font-weight: 800; line-height: 1.05; text-transform: uppercase; letter-spacing: .01em; }
+.cb-sign-note { margin: 0; text-align: center; font-size: 56px; opacity: .8; }

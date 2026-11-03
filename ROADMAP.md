@@ -6,7 +6,7 @@ Updated Nov 3, 2026. Phases 0-3 are built (on `main`); the sections below list w
 - Repo loads cleanly; Locations rename finished; templates and shortcodes for every post type.
 - Screen Mode (`?display=screen`) for every page and list, with URL overrides, live refresh, clock and local QR codes.
 - Time-aware core: Now/Next, starting-soon and in-progress states, schedule views, Event Days in Settings.
-- Display Boards: slide registry, Now/Next, daily and room schedules, sponsors, presenters, sessions, generated lists, general info, wayfinding; starter board on activation.
+- Display Boards: slide registry, Now/Next, daily and room schedules, sponsors, presenters, sessions, generated lists, general info, Location Info (directions + map), Directional Sign (arrows + bold label); starter board on activation.
 - Native row editor, Session Presenters box, unified Links list; sponsor levels in Settings.
 - JPG export per screen or board, plus ZIP export: one board ("Save all pages as ZIP" in the screen menu) or all boards from the Display Boards list (folder per board, or everything in the root).
 - Maps: live layer preview, parent-map fallback, Show Map toggle, overlay + labels stack for image maps.
