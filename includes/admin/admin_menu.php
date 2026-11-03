@@ -109,6 +109,7 @@ add_filter('menu_order', function ( $menu_order ) {
 			CONBOARD_CPTS
 		),
 		[
+			'conboard_planner',
 			'conboard_screens',
 			'conboard_settings',
 			'conboard_about',

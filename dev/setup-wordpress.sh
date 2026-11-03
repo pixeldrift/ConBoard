@@ -30,6 +30,9 @@ fi
 [ -f wp-config.php ] || $CLI config create --skip-check --dbname=x --dbuser=x --dbpass=x --dbhost=localhost
 if ! $CLI core is-installed 2>/dev/null; then
 	$CLI core install --url=http://localhost:8080 --title=ConBoardTest --admin_user=admin --admin_password=admin --admin_email=a@example.com --skip-email
+	# wp core install can guess the address from the folder layout; pin it
+	$CLI option update home http://localhost:8080
+	$CLI option update siteurl http://localhost:8080
 	$CLI plugin activate advanced-custom-fields conboard
 	$CLI rewrite structure '/%postname%/'
 	$CLI eval-file "$PLUGIN_DIR/dev/seed.php"

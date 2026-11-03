@@ -10,6 +10,18 @@ define( 'CONBOARD_ADMIN_PAGES', [
 		'url'				=> 'admin.php?page=conboard_dashboard',
 		'description'		=> 'You are here (hide this card later)',
 	],
+	'conboard_planner'		=> [
+		'title'				=> 'Program Planner',
+		'icon_code'			=> 'f489', // dashicons-schedule
+		'url'				=> 'admin.php?page=conboard_planner',
+		'description'		=> 'Drag sessions onto a day grid to build the program',
+	],
+	'conboard_screens'		=> [
+		'title'				=> 'Screen Assignments',
+		'icon_code'			=> 'f325', // dashicons-networking
+		'url'				=> 'admin.php?page=conboard_screens',
+		'description'		=> 'Choose which Display Board each physical screen shows',
+	],
 	'conboard_settings'		=> [
 		'title'				=> 'Settings',
 		'icon_code'			=> 'f108', // dashicons-admin-settings

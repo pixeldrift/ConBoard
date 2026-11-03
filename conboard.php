@@ -100,14 +100,17 @@ if (is_admin()) {
 	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_row_editor.php';
 	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_session_presenters.php';
 	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_links_metabox.php';
-	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_sessions_caching.php';
-	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_session_conflicts.php';
-	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_planner.php';
 	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_export_boards.php';
 	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_screens.php';
 
 }
 
+
+// Loaded for REST requests too (the Program Planner saves through the REST API, and saving a
+// session must refresh its cached counts and conflict flags). They only add hooks, so this is safe.
+require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_sessions_caching.php';
+require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_session_conflicts.php';
+require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_planner.php';
 
 // Hooks
 // Alert user if dependancy (Advanced Custom Fields plugin) is not installed
