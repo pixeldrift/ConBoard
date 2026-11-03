@@ -42,7 +42,8 @@ function conboard_get_track_choices(): array {
 
 // A comma separated setting as a list
 function conboard_setting_list( array $settings, string $key ): array {
-	$value = (string) ( $settings[ $key ] ?? '' );
+	$value = $settings[ $key ] ?? '';
+	$value = is_array( $value ) ? implode( ',', $value ) : (string) $value;
 	return $value === '' ? [] : array_values( array_filter( explode( ',', $value ), 'strlen' ) );
 }
 

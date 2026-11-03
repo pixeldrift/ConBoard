@@ -19,6 +19,7 @@ Updated Nov 3, 2026. Phases 0-3 are built (on `main`); the sections below list w
 - Program Planner (ConBoard > Program Planner): unscheduled cards, day grid with rooms as columns, drag to schedule, move, resize, unschedule (length kept), day arrows with prev/next strips; map pane (layers as drop zones, room list for maps without layers, room boxes with no map) with a red time line that follows the grid scroll, room highlights and title/time pills.
 
 ## Next
+- Block theme support for the public pages (use the active theme's template, not get_header/get_footer); schedule grid rows that shrink to fit a long day.
 - Screen status: last check-in per screen on the Screen Assignments page, and assigning a board to a group of screens at once.
 - Conflicts: visual report page, alternate room suggestions, Display Board awareness, prevent at save (optional).
 - Display Boards Phase 4: layouts, ticker, interruptions, scheduled slides, board editor live preview.
