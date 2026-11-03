@@ -1,4 +1,4 @@
-ƒ<?php
+<?php
 // includes/admin/admin_columns.php
 
 if ( ! defined('ABSPATH') ) exit;

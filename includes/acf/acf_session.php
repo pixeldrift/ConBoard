@@ -1,4 +1,4 @@
-ƒ<?php
+<?php
 // includes/acf/acf_session.php
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }
