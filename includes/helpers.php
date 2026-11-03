@@ -357,3 +357,79 @@ function conboard_get_session_room_setup( int $session_id ): string {
 
 	return conboard_get_default_setting( 'room_setup' );
 }
+
+
+/**
+ * Sessions worth pointing out on a session page, best first.
+ * A shared presenter ranks highest, then a shared Session Type, then the same room on the same day.
+ * Finished and cancelled sessions are left out.
+ *
+ * @return array[] Each is a schedule row (see conboard_schedule_row) plus 'reason' (short text).
+ */
+function conboard_get_related_sessions( int $session_id, int $limit = 3 ): array {
+
+	$mine_presenters = [];
+	foreach ( conboard_get_session_presenters( $session_id ) as $entry ) {
+		$mine_presenters[ (int) $entry['presenter_id'] ] = get_the_title( $entry['presenter_id'] );
+	}
+
+	$mine_terms = wp_get_post_terms( $session_id, 'session_type', [ 'fields' => 'id=>name' ] );
+	$mine_terms = is_array( $mine_terms ) ? $mine_terms : [];
+
+	$my_date = substr( (string) get_post_meta( $session_id, 'start_time', true ), 0, 10 );
+	$my_loc  = (int) get_post_meta( $session_id, 'location', true );
+
+	$ids = get_posts( [
+		'post_type'      => 'session',
+		'post_status'    => 'publish',
+		'posts_per_page' => 500,
+		'post__not_in'   => [ $session_id ],
+		'fields'         => 'ids',
+	] );
+
+	$scored = [];
+	$now    = conboard_now();
+
+	foreach ( $ids as $id ) {
+
+		$score  = 0;
+		$reason = '';
+
+		$shared = [];
+		foreach ( conboard_get_session_presenters( $id ) as $entry ) {
+			if ( isset( $mine_presenters[ (int) $entry['presenter_id'] ] ) ) $shared[] = $mine_presenters[ (int) $entry['presenter_id'] ];
+		}
+		if ( $shared ) {
+			$score += 100;
+			$reason = 'Also with ' . implode( ', ', array_unique( $shared ) );
+		}
+
+		if ( $mine_terms ) {
+			$terms  = wp_get_post_terms( $id, 'session_type', [ 'fields' => 'id=>name' ] );
+			$common = is_array( $terms ) ? array_intersect_key( $terms, $mine_terms ) : [];
+			if ( $common ) {
+				$score += 10;
+				if ( $reason === '' ) $reason = reset( $common );
+			}
+		}
+
+		if ( $my_loc && $my_date !== '' && (int) get_post_meta( $id, 'location', true ) === $my_loc
+			&& substr( (string) get_post_meta( $id, 'start_time', true ), 0, 10 ) === $my_date ) {
+			$score += 1;
+			if ( $reason === '' ) $reason = 'Same room, same day';
+		}
+
+		if ( $score === 0 ) continue;
+
+		$row = conboard_schedule_row( $id, $now );
+		if ( $row['cancelled'] || $row['state'] === 'past' ) continue;
+
+		$row['reason'] = $reason;
+		$scored[]      = [ $score, $row['start'] ?: PHP_INT_MAX, $row ];
+	}
+
+	// Best match first, then soonest
+	usort( $scored, fn( $a, $b ) => $b[0] <=> $a[0] ?: $a[1] <=> $b[1] );
+
+	return array_slice( array_column( $scored, 2 ), 0, max( 1, $limit ) );
+}

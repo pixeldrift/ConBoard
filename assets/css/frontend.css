@@ -217,3 +217,11 @@ a.conboard-card:focus .conboard-card-name {
 .conboard-schedule .cb-session-past .cb-progress span { background: var(--cb-web-muted); }
 .conboard-schedule .cb-sched[data-completed="dim"] .cb-session-past { opacity: 0.5; }
 .conboard-schedule .cb-sched[data-completed="hide"] .cb-session-past { display: none; }
+
+/* Related sessions on a session page */
+.conboard-related { margin-top: 2.5rem; }
+.conboard-related-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
+.conboard-related-card { display: flex; flex-direction: column; gap: 0.25rem; padding: 1rem; border: 1px solid rgba(0,0,0,0.12); border-top: 4px solid #2271b1; border-radius: 6px; text-decoration: none; color: inherit; background: rgba(34,113,177,0.04); }
+.conboard-related-card:hover { background: rgba(34,113,177,0.1); }
+.conboard-related-reason { font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.04em; color: #2271b1; }
+.conboard-related-when, .conboard-related-where { font-size: 0.9em; color: #646970; }

@@ -60,6 +60,27 @@ $presenters  = conboard_get_session_presenters($session_id);
 		<?php the_content(); ?>
 	</div>
 
+	<?php $related = conboard_get_related_sessions($session_id, 3); ?>
+	<?php if (!empty($related)) : ?>
+		<section class="conboard-related">
+			<h2>You might also like</h2>
+			<div class="conboard-related-cards">
+				<?php foreach ($related as $row) : ?>
+					<a class="conboard-related-card" href="<?php echo esc_url($row['url']); ?>">
+						<span class="conboard-related-reason"><?php echo esc_html($row['reason']); ?></span>
+						<strong><?php echo esc_html($row['title']); ?></strong>
+						<?php if ($row['start']) : ?>
+							<span class="conboard-related-when"><?php echo esc_html(conboard_schedule_time_label($row['start'], $row['end'])); ?></span>
+						<?php endif; ?>
+						<?php if ($row['location']) : ?>
+							<span class="conboard-related-where"><?php echo esc_html($row['location']); ?></span>
+						<?php endif; ?>
+					</a>
+				<?php endforeach; ?>
+			</div>
+		</section>
+	<?php endif; ?>
+
 </main>
 
 <?php get_footer(); ?>
