@@ -136,7 +136,8 @@ Slide types that can be shown on a Display Board include:
 - Session
 - Generated list (presenters, keynotes, staff, sponsors, or upcoming sessions)
 - General information (text, Wi-Fi details with a join code)
-- Wayfinding (a location, directions, and its map)
+- Directional sign (big arrows with a bold label, such as "Registration", for quick on-site signage instead of printed or handwritten signs)
+- Location info (a location's directions text and its map)
 
 Display Board examples:
 - A welcome screen in the lobby
@@ -239,7 +240,6 @@ The caveat with the export method is that your content will be static. The info 
 Everything in this README works today except the items below, which are described here but not built yet.
 
 #### Display Boards
-- **Wayfinding signs:** quick directional signs with big arrows pointing the way ("Registration ←", "Main Hall ↑") that can be put up on any screen in seconds. This replaces printed signs and marker-on-paper notes at the venue. Today the Wayfinding slide only shows a location's directions text and map. It has no arrows.
 - **Multi-panel boards:** layouts that show several things at once, such as announcements, Now / Next, and sponsor logos on one screen, and a ticker along the edge.
 - **Interruptions and scheduled slides:** priority messages that cut in, and slides that only run at certain times.
 - **Alternate slide looks:** other presentation styles per slide type (for example, a timeline view of a room schedule), and weighted or random sponsor rotation.
