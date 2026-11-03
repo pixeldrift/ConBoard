@@ -63,6 +63,9 @@ function conboard_admin_dashboard(): void {
 				</a>
 			<?php endforeach; ?>
 		</div>
+
+		<?php conboard_render_screen_links_section(); ?>
+
 	</div>
 <?php
 

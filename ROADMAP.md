@@ -17,12 +17,11 @@ Done (on `dev`):
 - `?display=screen` on any ConBoard page or list: Location (now/next + map), Session, Presenter, Sponsor, Staff, Announcement, and the Schedule, Presenters, Sponsors, Staff, Announcements and Locations lists.
 - Standalone screen page that scales a 1920x1080 stage (1080x1920 in portrait) to any display; orientation, rotate, flip, interval, refresh, clock and QR overrides in the URL.
 - Live refresh, looping pages, clock in the site time zone, locally drawn QR code, on-screen settings menu.
-- "Get Display Screen" box on every ConBoard post.
+- "Get Display Screen" box on every ConBoard post, and screen links for the list pages on the ConBoard Dashboard.
 
 Still to do:
 - Display Boards (Phase 3).
 - JPG export (Media Export) and batch export.
-- Screen links for the list pages in the admin.
 - Screen versions that use the Display Board slide timing.
 
 ## Phase 2: Time-aware core
