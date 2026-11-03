@@ -81,8 +81,7 @@ add_action('acf/save_post', function ( $post_id ) {
 
 }, 20); // after ACF saves fields
 
-// Clears the level from every sponsor that uses it. Not called yet: meant for when a level is deleted
-// in Settings. (This was found pasted into assets/js/sponsor_levels.js, where it broke the script.)
+// Clears the level from every sponsor that uses it (used when a level is deleted in Settings)
 function conboard_unlink_sponsor_level( string $slug ): void {
 
 	$query = new WP_Query([
@@ -102,3 +101,39 @@ function conboard_unlink_sponsor_level( string $slug ): void {
 		delete_post_meta( $post_id, 'sponsor_level_order' );
 	}
 }
+
+
+//
+// When the levels are saved in Settings: sponsors on a level that was deleted lose it (and so fall
+// back to the lowest remaining level), and the stored sort order of the rest is brought up to date.
+//
+function conboard_sync_sponsor_levels( $old, $new ): void {
+
+	$old = ( is_array( $old ) && ! empty( $old ) ) ? $old : conboard_get_default_sponsor_levels();
+	$new = is_array( $new ) ? $new : [];
+
+	foreach ( array_diff( array_keys( $old ), array_keys( $new ) ) as $removed ) {
+		conboard_unlink_sponsor_level( (string) $removed );
+	}
+
+	foreach ( $new as $slug => $level ) {
+
+		$sponsors = get_posts([
+			'post_type'			=> 'sponsor',
+			'post_status'		=> 'any',
+			'posts_per_page'	=> -1,
+			'fields'			=> 'ids',
+			'meta_key'			=> 'sponsor_level',
+			'meta_value'		=> (string) $slug,
+		]);
+
+		foreach ( $sponsors as $sponsor_id ) {
+			update_post_meta( $sponsor_id, 'sponsor_level_order', (int) ( $level['order'] ?? 999 ) );
+		}
+	}
+}
+
+add_action( 'update_option_conboard_sponsor_levels', 'conboard_sync_sponsor_levels', 10, 2 );
+add_action( 'add_option_conboard_sponsor_levels', function ( $option, $value ) {
+	conboard_sync_sponsor_levels( [], $value );
+}, 10, 2 );
