@@ -62,28 +62,5 @@ acf_add_local_field_group([
 			'ui'			=> 1,
 			'instructions'	=> 'Feature on the home page and at the top of the Presenters page.',
 		],
-
-		[
-			'key'			=> 'field_conboard_presenter_websites',
-			'label'			=> 'Websites',
-			'name'			=> 'presenter_websites',
-			'type'			=> 'repeater',
-			'button_label'	=> 'Add Website',
-			'sub_fields'	=> [
-				[
-					'key'		=> 'field_conboard_presenter_website_url',
-					'label'		=> 'URL',
-					'name'		=> 'url',
-					'type'		=> 'url',
-					'required'	=> 1,
-				],
-				[
-					'key'		=> 'field_conboard_presenter_website_label',
-					'label'		=> 'Label',
-					'name'		=> 'label',
-					'type'		=> 'text',
-				],
-			],
-		],
 	],
 ]);

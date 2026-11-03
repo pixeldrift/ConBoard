@@ -15,25 +15,8 @@ $pronouns = (string) get_post_meta($staff_id, 'pronouns', true);
 $role     = (string) get_post_meta($staff_id, 'role', true);
 $email    = (string) get_post_meta($staff_id, 'email', true);
 
-// Socials and web links share the same shape: label + url
-$links = [];
-
-foreach (['socials', 'links'] as $field) {
-	$rows = get_field($field, $staff_id);
-
-	if (!is_array($rows)) {
-		continue;
-	}
-
-	foreach ($rows as $row) {
-		if (!empty($row['url'])) {
-			$links[] = [
-				'url'   => $row['url'],
-				'label' => !empty($row['label']) ? $row['label'] : (parse_url($row['url'], PHP_URL_HOST) ?: $row['url']),
-			];
-		}
-	}
-}
+// Social and web links
+$links_html = conboard_render_post_links($staff_id, 'staff-links');
 
 ?>
 
@@ -67,17 +50,7 @@ foreach (['socials', 'links'] as $field) {
 				</div>
 			<?php endif; ?>
 
-			<?php if (!empty($links)) : ?>
-				<ul class="staff-links">
-					<?php foreach ($links as $link) : ?>
-						<li>
-							<a href="<?php echo esc_url($link['url']); ?>" target="_blank" rel="noopener">
-								<?php echo esc_html($link['label']); ?>
-							</a>
-						</li>
-					<?php endforeach; ?>
-				</ul>
-			<?php endif; ?>
+			<?php echo $links_html; // Escaped in conboard_render_post_links() ?>
 
 		</div>
 

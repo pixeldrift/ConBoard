@@ -36,6 +36,7 @@ define('CONBOARD_PLUGIN_URL', plugin_dir_url(__FILE__));
 require_once CONBOARD_PLUGIN_PATH . 'includes/helpers.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/presenter_roles.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/sponsor_levels.php';
+require_once CONBOARD_PLUGIN_PATH . 'includes/links.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/activation.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/defaults.php';
 require_once CONBOARD_PLUGIN_PATH . 'includes/shortcodes.php';
@@ -89,6 +90,9 @@ if (is_admin()) {
 	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_display_board_actions.php';
 	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_location_metaboxes.php';
 	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_screen_link.php';
+	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_row_editor.php';
+	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_session_presenters.php';
+	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_links_metabox.php';
 	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_sessions_caching.php';
 	require_once CONBOARD_PLUGIN_PATH . 'includes/admin/admin_session_conflicts.php';
 

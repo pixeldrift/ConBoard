@@ -17,20 +17,8 @@ $title    = get_post_meta($presenter_id, 'presenter_title', true);
 $org      = get_post_meta($presenter_id, 'presenter_organization', true);
 $email    = get_post_meta($presenter_id, 'presenter_email', true);
 
-// Websites
-$websites = [];
-$rows = get_field('presenter_websites', $presenter_id);
-
-if (is_array($rows)) {
-	foreach ($rows as $row) {
-		if (!empty($row['url'])) {
-			$websites[] = [
-				'url'   => $row['url'],
-				'label' => $row['label'] ?? '',
-			];
-		}
-	}
-}
+// Social and web links
+$links_html = conboard_render_post_links($presenter_id, 'presenter-websites');
 
 // Sessions this presenter is part of
 $sessions = conboard_get_sessions_for_presenter($presenter_id);
@@ -79,18 +67,7 @@ $sessions = conboard_get_sessions_for_presenter($presenter_id);
 				</div>
 			<?php endif; ?>
 
-			<?php if (!empty($websites)) : ?>
-				<ul class="presenter-websites">
-					<?php foreach ($websites as $site) : ?>
-						<?php $label = $site['label'] ?: parse_url($site['url'], PHP_URL_HOST); ?>
-						<li>
-							<a href="<?php echo esc_url($site['url']); ?>" target="_blank" rel="noopener">
-								<?php echo esc_html($label ?: $site['url']); ?>
-							</a>
-						</li>
-					<?php endforeach; ?>
-				</ul>
-			<?php endif; ?>
+			<?php echo $links_html; // Escaped in conboard_render_post_links() ?>
 
 		</div>
 

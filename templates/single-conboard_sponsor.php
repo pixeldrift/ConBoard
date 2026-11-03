@@ -13,7 +13,7 @@ $sponsor_id = get_the_ID();
 
 $level   = (string) get_post_meta($sponsor_id, 'sponsor_level', true);
 $website = (string) get_post_meta($sponsor_id, 'website', true);
-$socials = get_field('socials', $sponsor_id);
+$links_html = conboard_render_post_links($sponsor_id, 'sponsor-socials');
 
 ?>
 
@@ -43,21 +43,7 @@ $socials = get_field('socials', $sponsor_id);
 			</p>
 		<?php endif; ?>
 
-		<?php if (is_array($socials) && !empty($socials)) : ?>
-			<ul class="sponsor-socials">
-				<?php foreach ($socials as $social) : ?>
-					<?php
-					if (empty($social['url'])) continue;
-					$label = !empty($social['label']) ? $social['label'] : ucfirst((string) ($social['platform'] ?? 'Link'));
-					?>
-					<li>
-						<a href="<?php echo esc_url($social['url']); ?>" target="_blank" rel="noopener">
-							<?php echo esc_html($label); ?>
-						</a>
-					</li>
-				<?php endforeach; ?>
-			</ul>
-		<?php endif; ?>
+		<?php echo $links_html; // Escaped in conboard_render_post_links() ?>
 
 	</header>
 

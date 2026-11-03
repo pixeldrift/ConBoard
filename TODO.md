@@ -55,8 +55,8 @@ x	Page/CPT icons before page name
 	// Repeaters aren't available in the free version of ACF!
 	Add Presenter repeater to Session metabox
 	Add Presenter column to Sessions list
-	Fix Socials repeater in metaboxes
-	Fix weblinks repeater in metaboxes
+	Fix Socials repeater in metaboxes (done: native row editor)
+	Fix weblinks repeater in metaboxes (done: native row editor)
 
 	Sidebar VS metabox?
 

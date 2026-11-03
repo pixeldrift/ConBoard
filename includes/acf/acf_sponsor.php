@@ -28,17 +28,6 @@ acf_add_local_field_group([
 			'type'			=> 'url',
 		],
 
-		// Socials
-		[
-			'key'			=> 'field_sponsor_socials',
-			'label'			=> 'Socials',
-			'name'			=> 'socials',
-			'type'			=> 'repeater',
-			'layout'		=> 'row',
-			'button_label'	=> 'Add Social',
-			'sub_fields'	=> conboard_get_shared_social_fields(), // reference shared definition
-		],
-
 		// Display Order
 		[
 			'key'			=> 'field_sponsor_display_order',
