@@ -51,57 +51,5 @@ acf_add_local_field_group([
 	],
 ]);
 
-
-//
-// Session presenters
-//
-acf_add_local_field_group([
-	'key'		=> 'group_conboard_session_presenters',
-	'title'		=> 'Session Presenters',
-	'fields'	=> [
-
-		[
-			'key'			=> 'field_conboard_session_presenters',
-			'label'			=> 'Presenters',
-			'name'			=> 'presenters',
-			'type'			=> 'repeater',
-			'layout'		=> 'row',
-			'button_label'	=> 'Add Presenter',
-			'instructions'	=> 'Add presenters and define their role for this session.',
-			'sub_fields'	=> [
-
-				[
-					'key'			=> 'field_conboard_presenter_person',
-					'label'			=> 'Presenter',
-					'name'			=> 'presenter',
-					'type'			=> 'relationship',
-					'post_type'		=> [ 'presenter' ],
-					'filters'		=> [ 'search' ],
-					'return_format'	=> 'id',
-				],
-
-				[
-					'key'			=> 'field_conboard_presenter_role',
-					'label'			=> 'Role',
-					'name'			=> 'role',
-					'type'			=> 'select',
-					'choices'		=> conboard_get_presenter_role_choices(),
-					'default_value'	=> conboard_get_default_presenter_role(),
-					'ui'			=> 1,
-					'return_format'	=> 'value',
-				],
-
-			],
-		],
-
-	],
-	'location' => [
-		[
-			[
-				'param'		=> 'post_type',
-				'operator'	=> '==',
-				'value'		=> 'session',
-			],
-		],
-	],
-]);
+// Session presenters are edited in the Presenters box (includes/admin/admin_session_presenters.php),
+// which does not need the paid ACF repeater field.

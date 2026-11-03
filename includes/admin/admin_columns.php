@@ -224,15 +224,15 @@ function conboard_get_admin_columns_manifest(): array {
 			[
 				'key'		=> 'presenters',
 				'label'		=> 'Presenters',
-				'sortable'	=> true,
+				'sortable'	=> false,
 				'render'	=> function ( $post_id ) {
-					$presenter = get_field('presenter', $post_id);
-					if (! $presenter) { echo '—'; return; }
-					$id = is_object($presenter) ? $pres->ID : $presenter;
-					conboard_render_admin_link(
-						get_edit_post_link($id),
-						get_the_title($id)
-					);
+					$entries = conboard_get_session_presenters( $post_id );
+					if ( empty( $entries ) ) { echo '—'; return; }
+					$links = [];
+					foreach ( $entries as $entry ) {
+						$links[] = '<a href="' . esc_url( get_edit_post_link( $entry['presenter_id'] ) ) . '">' . esc_html( get_the_title( $entry['presenter_id'] ) ) . '</a>';
+					}
+					echo implode( ', ', $links ); // Escaped above
 				},
 			],
 

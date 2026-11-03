@@ -81,37 +81,111 @@ function conboard_normalize_ids( $value ): array {
 	return array_values( array_unique( $ids ) );
 }
 
-// Get structured presenters for a session
-// (the "presenter" sub-field is a relationship, so it can hold more than one ID)
+// ---------------------------------------------------------------------------
+// Session presenters
+//
+// Stored on the session as:
+//   _conboard_session_presenters  ordered list of [ 'presenter_id' => int, 'role' => string ]
+//   _conboard_presenter_index     one row per presenter ID (for fast "sessions for a presenter")
+// Sessions saved by older versions (ACF repeater: presenters, presenters_0_presenter, ...)
+// are still read until the session is saved again, which converts them.
+// ---------------------------------------------------------------------------
+
+// Presenters of a session, in order: [ [ 'presenter_id' => int, 'role' => string ], ... ]
 function conboard_get_session_presenters( int $session_id ): array {
-	$rows = get_field( 'presenters', $session_id );
-	if ( ! is_array( $rows ) ) {
-		return [];
+
+	$stored = get_post_meta( $session_id, '_conboard_session_presenters', true );
+
+	if ( ! is_array( $stored ) ) {
+		$stored = conboard_get_legacy_session_presenters( $session_id );
 	}
 
-	$out = [];
+	$roles = conboard_get_presenter_roles();
+	$out   = [];
 
-	foreach ( $rows as $row ) {
-		$role = ! empty( $row['role'] ) ? $row['role'] : conboard_get_default_presenter_role();
+	foreach ( $stored as $row ) {
+		$id = (int) ( $row['presenter_id'] ?? 0 );
 
-		foreach ( conboard_normalize_ids( $row['presenter'] ?? null ) as $presenter_id ) {
-			$out[] = [
-				'presenter_id'	=> $presenter_id,
-				'role'			=> $role,
-			];
+		if ( $id <= 0 ) {
+			continue;
+		}
+
+		$role = (string) ( $row['role'] ?? '' );
+
+		$out[] = [
+			'presenter_id'	=> $id,
+			'role'			=> isset( $roles[ $role ] ) ? $role : conboard_get_default_presenter_role(),
+		];
+	}
+
+	return $out;
+}
+
+// Rows written by the old ACF repeater field (read straight from post meta)
+function conboard_get_legacy_session_presenters( int $session_id ): array {
+
+	$count = (int) get_post_meta( $session_id, 'presenters', true );
+	$out   = [];
+
+	for ( $i = 0; $i < $count; $i++ ) {
+		$role = (string) get_post_meta( $session_id, 'presenters_' . $i . '_role', true );
+
+		foreach ( conboard_normalize_ids( get_post_meta( $session_id, 'presenters_' . $i . '_presenter', true ) ) as $presenter_id ) {
+			$out[] = [ 'presenter_id' => $presenter_id, 'role' => $role ];
 		}
 	}
 
 	return $out;
 }
 
-// IDs of published sessions that list a given presenter
-// ACF stores repeater rows as presenters_0_presenter, presenters_1_presenter, ...
-function conboard_get_session_ids_for_presenter( int $presenter_id ): array {
+// Save a session's presenters ( rows: [ [ 'presenter' => id, 'role' => key ], ... ] )
+function conboard_save_session_presenters( int $session_id, array $rows ): void {
+
+	$entries = [];
+
+	foreach ( $rows as $row ) {
+		$id = (int) ( $row['presenter'] ?? 0 );
+
+		if ( $id > 0 ) {
+			$entries[] = [ 'presenter_id' => $id, 'role' => (string) ( $row['role'] ?? '' ) ];
+		}
+	}
+
+	update_post_meta( $session_id, '_conboard_session_presenters', $entries );
+
+	delete_post_meta( $session_id, '_conboard_presenter_index' );
+	foreach ( array_unique( array_column( $entries, 'presenter_id' ) ) as $presenter_id ) {
+		add_post_meta( $session_id, '_conboard_presenter_index', $presenter_id );
+	}
+
+	conboard_delete_legacy_session_presenters( $session_id );
+}
+
+// Remove the old repeater's meta so removed presenters do not come back
+function conboard_delete_legacy_session_presenters( int $session_id ): void {
+
 	global $wpdb;
 
-	$key_like   = $wpdb->esc_like( 'presenters_' ) . '%' . $wpdb->esc_like( '_presenter' );
-	$value_like = '%' . $wpdb->esc_like( '"' . $presenter_id . '"' ) . '%';
+	$wpdb->query( $wpdb->prepare(
+		"DELETE FROM {$wpdb->postmeta}
+		 WHERE post_id = %d
+		   AND ( meta_key = 'presenters'
+		      OR meta_key = '_presenters'
+		      OR meta_key REGEXP '^_?presenters_[0-9]+_(presenter|role)$' )",
+		$session_id
+	) );
+
+	wp_cache_delete( $session_id, 'post_meta' );
+}
+
+// IDs of published sessions that list a given presenter
+function conboard_get_session_ids_for_presenter( int $presenter_id ): array {
+
+	global $wpdb;
+
+	// Sessions saved by older versions still have the ACF repeater rows
+	$legacy_key_like = $wpdb->esc_like( 'presenters_' ) . '%' . $wpdb->esc_like( '_presenter' );
+	$value_like      = '%' . $wpdb->esc_like( '"' . $presenter_id . '"' ) . '%';
 
 	$sql = $wpdb->prepare(
 		"SELECT DISTINCT pm.post_id
@@ -119,9 +193,12 @@ function conboard_get_session_ids_for_presenter( int $presenter_id ): array {
 		 INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
 		 WHERE p.post_type = 'session'
 		   AND p.post_status = 'publish'
-		   AND pm.meta_key LIKE %s
-		   AND ( pm.meta_value = %s OR pm.meta_value LIKE %s )",
-		$key_like,
+		   AND (
+		        ( pm.meta_key = '_conboard_presenter_index' AND pm.meta_value = %s )
+		     OR ( pm.meta_key LIKE %s AND ( pm.meta_value = %s OR pm.meta_value LIKE %s ) )
+		   )",
+		(string) $presenter_id,
+		$legacy_key_like,
 		(string) $presenter_id,
 		$value_like
 	);
