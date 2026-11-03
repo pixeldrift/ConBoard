@@ -22,8 +22,8 @@ Reusable as is: scaling and orientation shell, URL overrides, refresh, QR, scree
 
 ## 2. Decisions
 
-1. **Slides are rows on the board, not a second post type.** Use an ACF Flexible Content field (`slides`). Each slide type is one layout. This gives add, drag reorder, clone, collapse and delete for free, and avoids a second entity to keep in sync. Every row also has `enabled`, `duration` (0 = board default) and `template`.
-2. **Slide type registry.** `conboard_register_slide_type( $key, [ label, fields, templates, render, live ] )`. The flexible-content layouts are generated from the registry, and the playback engine only calls `render`. New types never touch the engine.
+1. **Slides are rows on the board, not a second post type, and no ACF Pro.** ConBoard must work on free ACF. Slides are stored as one JSON list in a single post meta (`_conboard_slides`), edited by a small native row editor (PHP + vanilla JS metabox): add, drag reorder, duplicate, collapse, delete, enable toggle. Each row has `type`, `enabled`, `duration` (0 = board default), `template` and a `settings` object, matching the product spec's JSON shape. Fields per slide type come from the registry. The row editor is built as a generic reusable component, so it can later replace the Pro-only repeaters (social links, web links, session presenters).
+2. **Slide type registry.** `conboard_register_slide_type( $key, [ label, fields, templates, render, live ] )`. The row editor's slide forms are generated from the registry, and the playback engine only calls `render`. New types never touch the engine.
 3. **Time-aware rendering in the browser.** Schedule slides output each session with `data-start`/`data-end` (UTC timestamps) and the server time offset. `signage.js` computes upcoming / starting soon / in progress / completed every second, and updates progress bars and countdowns. Periodic refresh then only picks up schedule edits, and slide duration and data refresh stay independent.
 4. **One schedule query layer.** `conboard_schedule_query( [ date, locations, tracks, window, completed, limit, group ] )` returns normalized rows (handles overlaps, cancelled, no location, multi-day). All schedule views and the existing location screen use it.
 5. **Playback.** The engine reads a per-slide duration from `data-duration`, supports `fade|none`, skips disabled slides, loops, and shows a friendly empty-board message. Refresh preserves the current slide.
@@ -40,7 +40,7 @@ Reusable as is: scaling and orientation shell, URL overrides, refresh, QR, scree
 
 ## 4. Risks and open points
 
-- Flexible Content needs ACF Pro (already required for repeaters).
+- **Existing Pro dependency:** the Session `presenters` field (`acf_session.php`) is an ACF repeater, which is Pro only, and the presenter helpers and caches read its `presenters_N_presenter` meta. On free ACF that field will not show. Fix (separate step): replace it with the native row editor, or a free relationship field plus a per-presenter role.
 - Cancelled sessions need a status field on sessions (not present yet); Phase 2 adds one.
 - Event "today" uses the site time zone; multi-day events rely on the Phase 2 event days setting.
 - Nothing here has been run in real WordPress yet; Phase 1 should be tested on the live site early.
