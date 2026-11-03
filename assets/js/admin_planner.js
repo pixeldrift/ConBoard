@@ -82,15 +82,16 @@
 	}
 	function endDrag() {
 		drag = null;
-		Array.prototype.forEach.call(root.querySelectorAll('.cbp-over'), function (n) { n.classList.remove('cbp-over'); });
+		Array.prototype.forEach.call(root.querySelectorAll('.cbp-over, .cbp-zone-over'), function (n) { n.classList.remove('cbp-over'); n.classList.remove('cbp-zone-over'); });
 	}
-	function dropZone(node, onDrop) {
+	function dropZone(node, onDrop, overClass) {
+		overClass = overClass || 'cbp-over';
 		node.addEventListener('dragover', function (e) {
 			if (!drag) return;
 			e.preventDefault();
-			node.classList.add('cbp-over');
+			node.classList.add(overClass);
 		});
-		node.addEventListener('dragleave', function () { node.classList.remove('cbp-over'); });
+		node.addEventListener('dragleave', function () { node.classList.remove(overClass); });
 		node.addEventListener('drop', function (e) {
 			if (!drag) return;
 			e.preventDefault();
@@ -217,6 +218,172 @@
 		return { minHour: minHour };
 	}
 
+
+	// ---- map pane ----
+	var maps = data.maps || [];
+	var mapChoice = null;          // location id of the chosen map, or 0 for "no map"
+	var cursor = 9 * 60;           // the time shown on the map (follows the grid scroll)
+	var mapEl = null, gridEl = null, cursorTag = null, cursorLine = null;
+
+	function pickDefaultMap() {
+		var withZones = maps.filter(function (m) {
+			return rooms.some(function (r) { return r.map === m.id && r.layers.length; });
+		})[0];
+		return withZones ? withZones.id : (maps.length ? maps[0].id : 0);
+	}
+
+	function activeAt(t) {
+		var date = days[dayIndex].date;
+		return sessions.filter(function (s) {
+			return s.date === date && s.start != null && !s.cancelled && s.start <= t && t < s.start + s.duration;
+		});
+	}
+	function placeHere(s, room) {
+		return schedule(s, days[dayIndex].date, cursor, room.id);
+	}
+
+	function renderMapPane() {
+		if (!mapEl) return;
+		if (mapChoice === null) mapChoice = pickDefaultMap();
+		mapEl.innerHTML = '';
+
+		var head = el('div', 'cbp-maphead');
+		head.appendChild(el('strong', '', 'Map'));
+		var sel = el('select');
+		maps.forEach(function (m) {
+			var o = el('option', '', m.title); o.value = String(m.id);
+			if (m.id === mapChoice) o.selected = true;
+			sel.appendChild(o);
+		});
+		var none = el('option', '', 'No map (room boxes)'); none.value = '0';
+		if (mapChoice === 0) none.selected = true;
+		sel.appendChild(none);
+		sel.addEventListener('change', function () { mapChoice = parseInt(sel.value, 10) || 0; renderMapPane(); });
+		head.appendChild(sel);
+		cursorTag = el('span', 'cbp-maptime', 'Map time: ' + clock(cursor));
+		head.appendChild(cursorTag);
+		mapEl.appendChild(head);
+
+		var body = el('div', 'cbp-mapbody');
+		mapEl.appendChild(body);
+
+		var map = maps.filter(function (m) { return m.id === mapChoice; })[0];
+		var chipRooms = rooms;
+		var zoned = [];                // {room, groups}
+		var stage = null;
+
+		if (map) {
+			stage = el('div', 'cbp-mapstage');
+			stage.innerHTML = map.html;       // sanitized on the server
+			body.appendChild(stage);
+
+			var svg = map.svg ? stage.querySelector('svg') : null;
+			var groups = {};
+			if (svg) {
+				Array.prototype.forEach.call(svg.children, function (g) {
+					if (g.tagName && g.tagName.toLowerCase() === 'g' && g.getAttribute('id')) groups[g.getAttribute('id')] = g;
+				});
+			}
+
+			var onMap = rooms.filter(function (r) { return r.map === map.id; });
+			var labelsImg = stage.querySelector('.conboard-map-labels');
+			var stack = stage.querySelector('.conboard-map-stack');
+			var loose = [];
+
+			onMap.forEach(function (room) {
+				var gs = room.layers.map(function (id) { return groups[id]; }).filter(Boolean);
+				var active = activeAt(cursor).filter(function (s) { return s.location === room.id; });
+
+				if (active.length && room.highlight && stack) {
+					var img = el('img', 'conboard-map-overlay conboard-map-highlight');
+					img.src = room.highlight; img.alt = '';
+					stack.insertBefore(img, labelsImg || null);
+				}
+
+				if (!gs.length) { loose.push(room); return; }
+
+				gs.forEach(function (g) {
+					g.classList.add('cbp-zone');
+					if (active.length) g.classList.add('cbp-hit');
+					var tip = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+					tip.textContent = room.title;
+					g.appendChild(tip);
+					dropZone(g, function (s) { placeHere(s, room); }, 'cbp-zone-over');
+				});
+				zoned.push({ room: room, groups: gs, active: active });
+			});
+
+			// Rooms with no layer on this map are dropped from the list below the map
+			chipRooms = onMap.length ? loose : rooms;
+			if (!zoned.length) {
+				var note = el('div', 'cbp-empty', onMap.length ? 'This map has no room layers assigned, so it is a visual guide. Drop sessions on a room below.' : 'No rooms use this map yet, so it is a visual guide. Drop sessions on a room below.');
+				body.insertBefore(note, stage);
+			}
+		}
+
+		if (chipRooms.length) {
+			var list = el('div', 'cbp-rooms');
+			chipRooms.forEach(function (room) {
+				var active = activeAt(cursor).filter(function (s) { return s.location === room.id; });
+				var box = el('div', 'cbp-roombox' + (active.length ? ' cbp-hit' : ''));
+				box.appendChild(el('strong', '', room.title));
+				if (active.length) {
+					var a = active[0];
+					var line = el('div', '', a.title + ' · ' + clock(a.start) + '–' + clock(a.start + a.duration));
+					line.draggable = true;
+					line.style.cursor = 'grab';
+					line.addEventListener('dragstart', function (e) { startDrag(e, a, 0); });
+					line.addEventListener('dragend', endDrag);
+					box.appendChild(line);
+					if (active.length > 1) box.appendChild(el('small', '', '+' + (active.length - 1) + ' more'));
+				} else {
+					box.appendChild(el('small', '', 'Free at ' + clock(cursor)));
+				}
+				dropZone(box, function (s) { placeHere(s, room); });
+				list.appendChild(box);
+			});
+			body.appendChild(list);
+		}
+
+		// Title and time pills sit over the highlighted rooms (positions need the stage to be laid out)
+		if (stage) {
+			var sr = stage.getBoundingClientRect();
+			zoned.forEach(function (z) {
+				if (!z.active.length) return;
+				var r = z.groups[0].getBoundingClientRect();
+				var a = z.active[0];
+				var pill = el('div', 'cbp-pill');
+				pill.style.left = (r.left - sr.left + r.width / 2) + 'px';
+				pill.style.top = (r.top - sr.top + r.height / 2) + 'px';
+				pill.appendChild(el('b', '', a.title));
+				pill.appendChild(el('span', '', clock(a.start) + ' – ' + clock(a.start + a.duration) + (z.active.length > 1 ? ' (+' + (z.active.length - 1) + ')' : '')));
+				pill.draggable = true;
+				pill.addEventListener('dragstart', function (e) { startDrag(e, a, 0); });
+				pill.addEventListener('dragend', endDrag);
+				dropZone(pill, function (s) { placeHere(s, z.room); }, 'cbp-zone-over');
+				stage.appendChild(pill);
+			});
+		}
+	}
+
+	// The red line in the grid marks the time the map shows; scrolling the grid moves it
+	var rafPending = false;
+	function updateCursor() {
+		if (!gridEl || !cursorLine) return;
+		var yView = 36 + Math.round((gridEl.clientHeight - 36) * 0.3);
+		cursorLine.style.top = yView + 'px';
+		var m = snap((gridEl.scrollTop + (yView - 36)) / PPM);
+		m = Math.max(0, Math.min(1440 - SNAP, m));
+		if (m !== cursor) { cursor = m; renderMapPane(); }
+		else if (cursorTag) cursorTag.textContent = 'Map time: ' + clock(cursor);
+		cursorLine.firstChild.textContent = clock(cursor);
+	}
+	function onGridScroll() {
+		if (rafPending) return;
+		rafPending = true;
+		window.requestAnimationFrame(function () { rafPending = false; updateCursor(); });
+	}
+
 	var keepScroll = null;
 
 	function render() {
@@ -226,7 +393,8 @@
 
 		// Left: map placeholder (step 2) + unscheduled
 		var left = el('div', 'cbp-left');
-		left.appendChild(el('div', 'cbp-map', 'The map pane comes in the next step. For now rooms are the columns of the day grid.'));
+		mapEl = el('div', 'cbp-map');
+		left.appendChild(mapEl);
 
 		var un = el('div', 'cbp-unscheduled');
 		var uh = el('header');
@@ -283,12 +451,21 @@
 		var grid2 = el('div', 'cbp-grid');
 		var info = renderGrid(grid2, day);
 		wrap.appendChild(grid2);
+		cursorLine = el('div', 'cbp-cursor');
+		cursorLine.style.left = '46px'; cursorLine.style.right = '46px';
+		cursorLine.appendChild(el('span', '', clock(cursor)));
+		wrap.appendChild(cursorLine);
 		wrap.appendChild(sliver('next', dayIndex + 1));
+		gridEl = grid2;
+		grid2.addEventListener('scroll', onGridScroll);
 		right.appendChild(wrap);
 		root.appendChild(right);
 
 		if (keepScroll) { grid2.scrollTop = keepScroll.top; grid2.scrollLeft = keepScroll.left; }
 		else grid2.scrollTop = Math.max(0, (info.minHour - 1) * HOUR);
+
+		updateCursor();
+		renderMapPane();
 	}
 
 	render();

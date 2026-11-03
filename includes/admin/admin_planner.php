@@ -60,6 +60,37 @@ function conboard_planner_session( $post ): array {
 	];
 }
 
+/**
+ * Maps the planner can show: every location with its own (non-overlay) map, with all layers visible
+ * so rooms can be dropped onto their layers.
+ */
+function conboard_planner_maps(): array {
+
+	$maps = [];
+
+	foreach ( get_posts( [ 'post_type' => 'location', 'post_status' => 'publish', 'posts_per_page' => -1, 'orderby' => 'title', 'order' => 'ASC' ] ) as $loc ) {
+
+		if ( ! conboard_get_location_own_map_id( $loc->ID ) || conboard_location_map_is_overlay( $loc->ID ) ) continue;
+
+		$stack = conboard_get_location_map_stack( $loc->ID );
+		if ( ! $stack || ! $stack['base'] ) continue;
+
+		$base = conboard_get_map_base_markup( $stack['base'], sprintf( 'Map of %s', get_the_title( $loc ) ), null );
+		if ( $base === '' ) continue;
+
+		$labels = $stack['labels'] ? conboard_get_map_overlay_img( $stack['labels'], 'conboard-map-labels' ) : '';
+
+		$maps[] = [
+			'id'    => (int) $loc->ID,
+			'title' => get_the_title( $loc ),
+			'svg'   => get_post_mime_type( $stack['base'] ) === 'image/svg+xml',
+			'html'  => '<div class="conboard-map-stack">' . $base . $labels . '</div>',
+		];
+	}
+
+	return $maps;
+}
+
 function conboard_planner_data(): array {
 
 	$sessions = [];
@@ -74,10 +105,17 @@ function conboard_planner_data(): array {
 
 	$room_list = [];
 	foreach ( $rooms as $r ) {
+		$stack  = conboard_get_location_map_stack( $r->ID );
+		$layers = get_post_meta( $r->ID, CONBOARD_LOCATION_MAP_LAYER_FIELD, true );
+		$is_svg = $stack && $stack['base'] && get_post_mime_type( $stack['base'] ) === 'image/svg+xml';
+
 		$room_list[] = [
-			'id'     => (int) $r->ID,
-			'title'  => get_the_title( $r ),
-			'parent' => $r->post_parent ? get_the_title( $r->post_parent ) : '',
+			'id'        => (int) $r->ID,
+			'title'     => get_the_title( $r ),
+			'parent'    => $r->post_parent ? get_the_title( $r->post_parent ) : '',
+			'map'       => $stack ? (int) $stack['base_loc'] : 0,                       // location whose map this room sits on
+			'layers'    => ( $is_svg && is_array( $layers ) ) ? array_values( array_map( 'strval', $layers ) ) : [],
+			'highlight' => ( $stack && $stack['highlight'] ) ? (string) wp_get_attachment_url( $stack['highlight'] ) : '',
 		];
 	}
 
@@ -103,6 +141,7 @@ function conboard_planner_data(): array {
 	return [
 		'sessions' => $sessions,
 		'rooms'    => $room_list,
+		'maps'     => conboard_planner_maps(),
 		'days'     => $day_list,
 		'snap'     => CONBOARD_PLANNER_SNAP,
 		'defaultMinutes' => conboard_default_session_minutes(),
@@ -197,7 +236,28 @@ function conboard_planner_page(): void {
 	<style>
 		.conboard-planner-wrap #conboard-planner { display:flex; gap:16px; height:calc(100vh - 190px); min-height:520px; }
 		.cbp-left { flex:1 1 0; min-width:280px; display:flex; flex-direction:column; gap:12px; }
-		.cbp-map { flex:1 1 55%; border:2px dashed #c3c4c7; border-radius:6px; display:flex; align-items:center; justify-content:center; color:#787c82; background:#fff; text-align:center; padding:12px; }
+		.cbp-map { flex:1 1 55%; min-height:0; border:1px solid #c3c4c7; border-radius:6px; display:flex; flex-direction:column; background:#fff; }
+		.cbp-maphead { display:flex; gap:10px; align-items:center; padding:6px 10px; border-bottom:1px solid #dcdcde; font-size:12px; }
+		.cbp-maphead select { max-width:240px; }
+		.cbp-maptime { margin-left:auto; font-weight:600; }
+		.cbp-mapbody { position:relative; flex:1; min-height:0; overflow:auto; padding:8px; }
+		.cbp-mapstage { position:relative; }
+		.cbp-mapstage .conboard-map-stack { position:relative; }
+		.cbp-mapstage svg, .cbp-mapstage img.conboard-map-image { max-width:100%; height:auto; display:block; margin:0 auto; }
+		.cbp-mapstage .conboard-map-stack > img.conboard-map-overlay { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; pointer-events:none; }
+		.cbp-zone { cursor:copy; }
+		.cbp-zone.cbp-hit, .cbp-zone.cbp-hit * { fill:#72aee6 !important; fill-opacity:.65 !important; }
+		.cbp-zone.cbp-zone-over, .cbp-zone.cbp-zone-over * { fill:#2271b1 !important; fill-opacity:.55 !important; }
+		.cbp-pill { position:absolute; transform:translate(-50%,-50%); background:#fff; border:1px solid #2271b1; border-radius:4px; padding:2px 6px; font-size:11px; line-height:1.25; max-width:160px; text-align:center; cursor:grab; box-shadow:0 1px 3px rgba(0,0,0,.25); z-index:2; }
+		.cbp-pill b { display:block; }
+		.cbp-rooms { display:flex; flex-wrap:wrap; gap:8px; padding:8px 0 0; }
+		.cbp-roombox { min-width:120px; flex:1 1 120px; max-width:200px; border:2px dashed #c3c4c7; border-radius:6px; padding:8px; font-size:12px; background:#fafafa; }
+		.cbp-roombox.cbp-hit { background:#d7eafc; border:2px solid #2271b1; }
+		.cbp-roombox.cbp-over { outline:3px solid #2271b1; }
+		.cbp-roombox strong { display:block; }
+		.cbp-cursor { position:absolute; left:0; right:0; height:0; border-top:2px solid #d63638; z-index:4; pointer-events:none; }
+		.cbp-cursor span { position:absolute; right:2px; top:-18px; background:#d63638; color:#fff; font-size:10px; padding:1px 5px; border-radius:3px; }
+		.cbp-daywrap { position:relative; }
 		.cbp-unscheduled { flex:1 1 45%; display:flex; flex-direction:column; background:#fff; border:1px solid #c3c4c7; border-radius:6px; min-height:0; }
 		.cbp-unscheduled.cbp-over, .cbp-sliver.cbp-over { outline:3px solid #2271b1; }
 		.cbp-unscheduled header { padding:8px 10px; display:flex; gap:8px; align-items:center; border-bottom:1px solid #dcdcde; }
