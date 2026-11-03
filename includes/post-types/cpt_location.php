@@ -23,7 +23,7 @@ add_action('init', function () {
 		'show_in_menu'	=> 'conboard',
 		'icon_code'		=> 'f231',  // dashicons-location-alt
 		'supports'		=> ['title', 'editor', 'thumbnail', 'page-attributes'],
-		'has_archive'	=> false,
+		'has_archive'	=> true,
 		'rewrite'		=> ['slug' => 'locations'],
 		'hierarchical'	=> true, //
 		'show_in_rest'	=> true,

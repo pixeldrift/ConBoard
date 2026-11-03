@@ -157,3 +157,28 @@ a.conboard-card:focus .conboard-card-name {
 
 .session-current { font-weight: 600; }
 .session-past { opacity: 0.6; }
+
+/* Staff, announcements, locations */
+.staff-header,
+.sponsor-header,
+.presenter-header { display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: flex-start; }
+
+.staff-photo,
+.presenter-photo { flex: 0 0 240px; max-width: 100%; }
+.staff-photo img,
+.presenter-photo img { width: 100%; height: auto; border-radius: 8px; }
+.staff-meta,
+.presenter-meta { flex: 1 1 260px; }
+
+.sponsor-logo img { max-width: 320px; max-height: 200px; width: auto; height: auto; }
+.staff-links,
+.sponsor-socials,
+.presenter-websites { list-style: none; padding: 0; }
+
+.conboard-announcement { margin: 1.5rem 0; }
+.conboard-announcement-title { margin: 0 0 0.25rem; }
+.conboard-announcement-date { display: block; font-size: 0.85em; opacity: 0.7; margin-bottom: 0.5rem; }
+
+.conboard-location-tree { padding-left: 1.25rem; }
+.conboard-location-tree .conboard-location-tree { margin-top: 0.25rem; }
+.conboard-location-type { font-size: 0.85em; opacity: 0.7; }

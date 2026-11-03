@@ -137,3 +137,52 @@ add_shortcode( 'conboard_featured_speaker', function ( $atts ) {
 
 	return $presenter ? conboard_render_featured_speaker( $presenter ) : '';
 });
+
+
+//
+// [conboard_staff] - staff photos and roles anywhere
+//
+//   layout="grid|carousel"  columns="4"  limit="8"  roles="yes|no"
+//   autoplay="yes"  speed="5"   carousel only
+//
+add_shortcode( 'conboard_staff', function ( $atts ) {
+
+	$atts = shortcode_atts([
+		'layout'	=> 'grid',
+		'columns'	=> 4,
+		'limit'		=> 0,
+		'roles'		=> 'yes',
+		'autoplay'	=> 'yes',
+		'speed'		=> 5,
+	], $atts, 'conboard_staff' );
+
+	return conboard_render_staff([
+		'layout'		=> $atts['layout'] === 'carousel' ? 'carousel' : 'grid',
+		'columns'		=> (int) $atts['columns'],
+		'limit'			=> (int) $atts['limit'],
+		'show_role'		=> conboard_is_truthy( $atts['roles'] ),
+		'autoplay'		=> conboard_is_truthy( $atts['autoplay'] ),
+		'speed'			=> (int) $atts['speed'],
+	]);
+});
+
+
+//
+// [conboard_announcements] - latest announcements anywhere
+//
+//   limit="3"   excerpt="yes" for a short preview instead of the full text   dates="yes|no"
+//
+add_shortcode( 'conboard_announcements', function ( $atts ) {
+
+	$atts = shortcode_atts([
+		'limit'		=> 3,
+		'excerpt'	=> 'no',
+		'dates'		=> 'yes',
+	], $atts, 'conboard_announcements' );
+
+	return conboard_render_announcements([
+		'limit'		=> (int) $atts['limit'],
+		'excerpt'	=> conboard_is_truthy( $atts['excerpt'] ),
+		'show_date'	=> conboard_is_truthy( $atts['dates'] ),
+	]);
+});

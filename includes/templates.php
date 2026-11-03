@@ -10,16 +10,24 @@ add_filter('template_include', function ($template) {
 	$post_type = get_post_type();
 
 	// Keys are the registered post type slugs (see includes/post-types/).
-	// Only templates that are ready for use are mapped here. Others (announcement,
-	// display_board, staff) are still stubs
-	// or need rework, so the theme's own templates handle them for now.
+	// Only templates that are ready for use are mapped here. Display Boards are not
+	// mapped yet (they belong to Screen Mode), so the theme's own templates handle them.
 	$templates = [
 		'presenter' => [
 			'single'	=> 'single-conboard_presenter.php',
 			'archive'	=> 'archive-conboard_presenter.php',
 		],
+		'announcement' => [
+			'single'	=> 'single-conboard_announcement.php',
+			'archive'	=> 'archive-conboard_announcement.php',
+		],
 		'location' => [
 			'single'	=> 'single-conboard_location.php',
+			'archive'	=> 'archive-conboard_location.php',
+		],
+		'staff' => [
+			'single'	=> 'single-conboard_staff.php',
+			'archive'	=> 'archive-conboard_staff.php',
 		],
 		'sponsor' => [
 			'single'	=> 'single-conboard_sponsor.php',

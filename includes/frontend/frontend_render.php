@@ -483,3 +483,182 @@ function conboard_render_featured_speaker( WP_Post $presenter ): string {
 
 	return $html;
 }
+
+
+// ---------------------------------------------------------------------------
+// Staff
+// ---------------------------------------------------------------------------
+
+// Published staff, by Display Order (lowest first), then name
+function conboard_get_staff( array $args = [] ): array {
+
+	$args = wp_parse_args( $args, [ 'limit' => 0 ] );
+
+	$staff = get_posts([
+		'post_type'			=> 'staff',
+		'post_status'		=> 'publish',
+		'posts_per_page'	=> -1,
+	]);
+
+	usort( $staff, function ( $a, $b ) {
+		$order = (int) get_post_meta( $a->ID, 'display_order', true ) <=> (int) get_post_meta( $b->ID, 'display_order', true );
+		return $order !== 0 ? $order : strcasecmp( $a->post_title, $b->post_title );
+	});
+
+	if ( $args['limit'] > 0 ) {
+		$staff = array_slice( $staff, 0, (int) $args['limit'] );
+	}
+
+	return $staff;
+}
+
+// One staff card: photo, name and role, linked to their page
+function conboard_render_staff_card( WP_Post $member, bool $show_role = true ): string {
+
+	$photo = get_the_post_thumbnail( $member->ID, 'medium', [ 'alt' => get_the_title( $member ), 'loading' => 'lazy' ] );
+	$role  = $show_role ? (string) get_post_meta( $member->ID, 'role', true ) : '';
+
+	$html  = '<a class="conboard-card conboard-staff-card" href="' . esc_url( get_permalink( $member ) ) . '">';
+	$html .= $photo ? '<span class="conboard-card-photo">' . $photo . '</span>' : '';
+	$html .= '<span class="conboard-card-name">' . esc_html( get_the_title( $member ) ) . '</span>';
+	$html .= $role ? '<span class="conboard-card-subtitle">' . esc_html( $role ) . '</span>' : '';
+	$html .= '</a>';
+
+	return $html;
+}
+
+/**
+ * Staff as a grid or carousel.
+ *
+ * @param array $args limit, columns, layout (grid|carousel), show_role, autoplay, speed
+ */
+function conboard_render_staff( array $args = [] ): string {
+
+	$args = wp_parse_args( $args, [
+		'limit'			=> 0,
+		'columns'		=> 4,
+		'layout'		=> 'grid',
+		'show_role'		=> true,
+		'autoplay'		=> true,
+		'speed'			=> 5,
+	]);
+
+	$staff = conboard_get_staff([ 'limit' => $args['limit'] ]);
+
+	if ( empty( $staff ) ) {
+		return '';
+	}
+
+	$cards = array_map( function ( WP_Post $member ) use ( $args ) {
+		return conboard_render_staff_card( $member, (bool) $args['show_role'] );
+	}, $staff );
+
+	return '<div class="conboard-staff">' . conboard_render_card_list( $cards, [
+		'layout'	=> $args['layout'] === 'carousel' ? 'carousel' : 'grid',
+		'columns'	=> $args['columns'],
+		'autoplay'	=> $args['autoplay'],
+		'speed'		=> $args['speed'],
+		'label'		=> 'Staff',
+	]) . '</div>';
+}
+
+
+// ---------------------------------------------------------------------------
+// Announcements
+// ---------------------------------------------------------------------------
+
+// Published announcements, newest first
+function conboard_get_announcements( array $args = [] ): array {
+
+	$args = wp_parse_args( $args, [ 'limit' => 0 ] );
+
+	return get_posts([
+		'post_type'			=> 'announcement',
+		'post_status'		=> 'publish',
+		'posts_per_page'	=> $args['limit'] > 0 ? (int) $args['limit'] : -1,
+		'orderby'			=> 'date',
+		'order'				=> 'DESC',
+	]);
+}
+
+/**
+ * Announcements as a list, newest first.
+ *
+ * @param array $args limit, excerpt (short preview instead of the full text), show_date
+ */
+function conboard_render_announcements( array $args = [] ): string {
+
+	$args = wp_parse_args( $args, [ 'limit' => 0, 'excerpt' => false, 'show_date' => true ] );
+
+	$announcements = conboard_get_announcements([ 'limit' => $args['limit'] ]);
+
+	if ( empty( $announcements ) ) {
+		return '';
+	}
+
+	conboard_enqueue_frontend();
+
+	$html = '<div class="conboard-announcements">';
+
+	foreach ( $announcements as $announcement ) {
+
+		$html .= '<article class="conboard-announcement">';
+		$html .= '<h3 class="conboard-announcement-title"><a href="' . esc_url( get_permalink( $announcement ) ) . '">' . esc_html( get_the_title( $announcement ) ) . '</a></h3>';
+
+		if ( $args['show_date'] ) {
+			$html .= '<time class="conboard-announcement-date" datetime="' . esc_attr( get_the_date( 'c', $announcement ) ) . '">'
+				. esc_html( get_the_date( 'F j, g:i A', $announcement ) ) . '</time>';
+		}
+
+		if ( $args['excerpt'] ) {
+			$text = wp_trim_words( wp_strip_all_tags( strip_shortcodes( $announcement->post_content ) ), 35 );
+			$html .= $text ? '<p class="conboard-announcement-text">' . esc_html( $text ) . '</p>' : '';
+		} else {
+			$html .= '<div class="conboard-announcement-text">' . wpautop( wp_kses_post( $announcement->post_content ) ) . '</div>';
+		}
+
+		$html .= '</article>';
+	}
+
+	return $html . '</div>';
+}
+
+
+// ---------------------------------------------------------------------------
+// Locations: nested list (campus > building > floor > room)
+// ---------------------------------------------------------------------------
+
+function conboard_render_location_tree( int $parent_id = 0, int $max_depth = 6 ): string {
+
+	if ( $max_depth <= 0 ) {
+		return '';
+	}
+
+	$locations = get_posts([
+		'post_type'			=> 'location',
+		'post_parent'		=> $parent_id,
+		'post_status'		=> 'publish',
+		'posts_per_page'	=> -1,
+		'orderby'			=> 'menu_order title',
+		'order'				=> 'ASC',
+	]);
+
+	if ( empty( $locations ) ) {
+		return '';
+	}
+
+	$html = '<ul class="conboard-location-tree">';
+
+	foreach ( $locations as $location ) {
+
+		$type  = (string) get_post_meta( $location->ID, 'location_type', true );
+		$label = $type ? conboard_get_field_choice_label( 'location_type', $type, $location->ID ) : '';
+
+		$html .= '<li><a href="' . esc_url( get_permalink( $location ) ) . '">' . esc_html( get_the_title( $location ) ) . '</a>';
+		$html .= $label ? ' <span class="conboard-location-type">(' . esc_html( $label ) . ')</span>' : '';
+		$html .= conboard_render_location_tree( (int) $location->ID, $max_depth - 1 );
+		$html .= '</li>';
+	}
+
+	return $html . '</ul>';
+}
