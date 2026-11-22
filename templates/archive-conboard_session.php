@@ -5,7 +5,7 @@
  * Archive: Sessions
  */
 
-get_header();
+conboard_template_header();
 
 $now = current_time('timestamp');
 
@@ -74,4 +74,4 @@ $query = new WP_Query([
 
 </main>
 
-<?php get_footer(); ?>
+<?php conboard_template_footer(); ?>

@@ -3,6 +3,7 @@
 Updated Nov 3, 2026. Phases 0-3 are built (on `main`); the sections below list what is left.
 
 ## Done
+- Public pages (sessions, presenters, locations, sponsors, staff, announcements) work on block themes: they use the theme's own header, footer and page width. Classic themes are unchanged.
 - Screen registry: Screens (name, location, resolution, rotation, player type, notes, reference photo), a permanent address per screen that shows its assigned board and updates itself when reassigned, and the Screen Assignments page with drag and drop in both directions.
 - Repo loads cleanly; Locations rename finished; templates and shortcodes for every post type.
 - Screen Mode (`?display=screen`) for every page and list, with URL overrides, live refresh, clock and local QR codes.
@@ -19,7 +20,7 @@ Updated Nov 3, 2026. Phases 0-3 are built (on `main`); the sections below list w
 - Program Planner (ConBoard > Program Planner): unscheduled cards, day grid with rooms as columns, drag to schedule, move, resize, unschedule (length kept), day arrows with prev/next strips; map pane (layers as drop zones, room list for maps without layers, room boxes with no map) with a red time line that follows the grid scroll, room highlights and title/time pills.
 
 ## Next
-- Block theme support for the public pages (use the active theme's template, not get_header/get_footer); schedule grid rows that shrink to fit a long day.
+- Schedule grid rows that shrink to fit a long day; the Sessions archive page could use the live schedule layout.
 - Screen status: last check-in per screen on the Screen Assignments page, and assigning a board to a group of screens at once.
 - Conflicts: visual report page, alternate room suggestions, Display Board awareness, prevent at save (optional).
 - Display Boards Phase 4: layouts, ticker, interruptions, scheduled slides, board editor live preview.

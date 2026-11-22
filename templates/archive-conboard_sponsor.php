@@ -5,7 +5,7 @@
  * Archive: Sponsors, grouped by level
  */
 
-get_header();
+conboard_template_header();
 
 $sponsors_html = conboard_render_sponsors([
 	'layout'	=> 'levels',
@@ -27,4 +27,4 @@ $sponsors_html = conboard_render_sponsors([
 
 </main>
 
-<?php get_footer(); ?>
+<?php conboard_template_footer(); ?>

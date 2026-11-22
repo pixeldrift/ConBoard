@@ -60,3 +60,57 @@ add_filter('template_include', function ($template) {
 
 	return $template;
 });
+
+
+// ---------------------------------------------------------------------------
+// Page frame: classic themes and block themes
+// ---------------------------------------------------------------------------
+//
+// Classic themes have header.php and footer.php, so get_header() and get_footer() do the job.
+// Block themes (Twenty Twenty-Five and most new sites) have neither: their header and footer are
+// "template parts". So on a block theme the page is built here instead: the document head, the
+// theme's own header part, a wrapper with the theme's page padding and width, and the footer part.
+// The ConBoard templates only fill in what goes between them.
+
+function conboard_is_block_theme(): bool {
+	return function_exists( 'wp_is_block_theme' ) && wp_is_block_theme() && function_exists( 'block_template_part' );
+}
+
+function conboard_template_header(): void {
+
+	if ( ! conboard_is_block_theme() ) {
+		get_header();
+		return;
+	}
+
+	?><!DOCTYPE html>
+<html <?php language_attributes(); ?>>
+<head>
+	<meta charset="<?php bloginfo( 'charset' ); ?>">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<?php wp_head(); ?>
+</head>
+<body <?php body_class(); ?>>
+<?php wp_body_open(); ?>
+<div class="wp-site-blocks">
+<?php block_template_part( 'header' ); ?>
+<div class="conboard-block-page wp-block-group has-global-padding is-layout-constrained">
+<?php
+}
+
+function conboard_template_footer(): void {
+
+	if ( ! conboard_is_block_theme() ) {
+		get_footer();
+		return;
+	}
+
+	?>
+</div>
+<?php block_template_part( 'footer' ); ?>
+</div>
+<?php wp_footer(); ?>
+</body>
+</html>
+<?php
+}

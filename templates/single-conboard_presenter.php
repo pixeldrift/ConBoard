@@ -5,7 +5,7 @@
  * Single Presenter
  */
 
-get_header();
+conboard_template_header();
 
 the_post();
 
@@ -118,4 +118,4 @@ $sessions = conboard_get_sessions_for_presenter($presenter_id);
 
 </main>
 
-<?php get_footer(); ?>
+<?php conboard_template_footer(); ?>

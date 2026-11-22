@@ -5,7 +5,7 @@
  * Archive: Presenters (keynote speakers first, then featured, then everyone else)
  */
 
-get_header();
+conboard_template_header();
 
 $presenters_html = conboard_render_presenters([
 	'layout'	=> 'grid',
@@ -26,4 +26,4 @@ $presenters_html = conboard_render_presenters([
 
 </main>
 
-<?php get_footer(); ?>
+<?php conboard_template_footer(); ?>

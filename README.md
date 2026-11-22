@@ -259,7 +259,6 @@ Everything in this README works today except the items below, which are describe
 - **Screen groups:** assign one board to every screen in a location or group at once.
 
 #### Compatibility and polish
-- **Block themes:** the single and archive pages for sessions, presenters, locations and so on load a classic theme header and footer. On a block theme (such as Twenty Twenty-Five) they still work, but show a bare header with no menu and no page margins. They should use the active theme's own template instead.
 - **Schedule grid with a very long day:** a grid slide that spans many hours (for example sessions from 2 AM to 11 PM) runs past the bottom of the screen. It should shrink its rows to fit.
 
 #### Scheduling
